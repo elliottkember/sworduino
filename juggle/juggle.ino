@@ -21,7 +21,7 @@ Juggle just moves some balls back and forth. A single ball could be a Cylon effe
 #define LED_DT     7
 #define COLOR_ORDER GRB
 #define LED_TYPE     WS2812B
-#define NUM_LEDS    550
+#define NUM_LEDS    1500
 
 
 // Initialize changeable global variables.
@@ -48,15 +48,8 @@ void setup() {
 //  LEDS.addLeds<LED_TYPE, LED_DT, LED_CK, COLOR_ORDER>(leds, NUM_LEDS);  // Use this for WS2801 or APA102
 
   FastLED.setBrightness(max_bright);
-  set_max_power_in_volts_and_milliamps(5, 500);               // FastLED power management set at 5V, 500mA.
+  set_max_power_in_volts_and_milliamps(5, 1000);               // FastLED power management set at 5V, 500mA.
 } // setup()
-
-  
-void loop() {
-  ChangeMe();
-  juggle();
-  show_at_max_brightness_for_power();                         // Power managed display of LED's.
-} // loop()
 
 
 void juggle() {                                               // Several colored dots, weaving in and out of sync with each other
@@ -82,4 +75,12 @@ void ChangeMe() {                                             // A time (rather 
     }
   }
 } // ChangeMe()
+
+  
+void loop() {
+  ChangeMe();
+  juggle();
+  show_at_max_brightness_for_power();                         // Power managed display of LED's.
+} // loop()
+
 

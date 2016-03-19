@@ -1,7 +1,7 @@
 
 /* Confetti
 
-  By: Mark Kriegsman
+    By: Mark Kriegsman
 
   Modified By: Andrew Tuline
 
@@ -23,7 +23,7 @@
 //#define LED_CK 11                                             // Clock pin for the strip.
 #define COLOR_ORDER GRB                                       // Are they RGB, GRB or what??
 #define LED_TYPE WS2812B                                       // Don't forget to change LEDS.addLeds
-#define NUM_LEDS 550                                           // Number of LED's.
+#define NUM_LEDS 1500                                           // Number of LED's.
 
 // Initialize changeable global variables.
 uint8_t max_bright = 255;                                      // Overall brightness definition. It can be changed on the fly.
@@ -33,15 +33,29 @@ struct CRGB leds[NUM_LEDS];                                   // Initialize our 
 unsigned long previousMillis;                                 // Store last time the strip was updated.
 
 // Define variables used by the sequences.
-uint8_t  thisfade = 50;                                        // How quickly does it fade? Lower = slower fade rate.
+uint8_t  thisfade = 200;                                        // How quickly does it fade? Lower = slower fade rate.
 int       thishue = 50;                                       // Starting hue.
-uint8_t   thisinc = 1;                                        // Incremental value for rotating hues
-uint8_t   thissat = 200;                                      // The saturation, where 255 = brilliant colours.
+uint8_t   thisinc = 20;                                        // Incremental value for rotating hues
+uint8_t   thissat = 240;                                      // The saturation, where 255 = brilliant colours.
 uint8_t   thisbri = 255;                                      // Brightness of a sequence. Remember, max_bright is the overall limiter.
 int       huediff = 256;                                      // Range of random #'s to use for hue
-uint8_t thisdelay = 1;                                        // We don't need much delay (if any)
+uint8_t thisdelay = 0;                                        // We don't need much delay (if any)
+
+const     rainbow = true;
+
+const int ledPin = 13;
+const int led = 13;
 
 void setup() {
+
+  pinMode(led, OUTPUT);     
+  digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
+  delay(1000);               // wait for a second
+  digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW
+  delay(1000);               // wait for a second
+
+  pinMode(ledPin, OUTPUT);
+  
   delay(3000);                                                // Power-up safety delay or something like that.
   Serial.begin(57600);
 
@@ -49,42 +63,28 @@ void setup() {
   //  LEDS.addLeds<LED_TYPE, LED_DT, LED_CK, COLOR_ORDER>(leds, NUM_LEDS);  // Use this for WS2801 or APA102
 
   FastLED.setBrightness(max_bright);
-  set_max_power_in_volts_and_milliamps(5, 6000);               // FastLED power management set at 5V, 500mA.
+  set_max_power_in_volts_and_milliamps(5, 4000);               // FastLED power management set at 5V, 500mA.
 }
 
-
-void loop () {
-
-  confetti();
-
-  //  EVERY_N_MILLISECONDS(1000) {                           // FastLED based non-blocking delay to update/display the sequence.
-  //    ChangeMe();                                           // Check the demo loop for changes to the variables.
-  //    confetti();
-  //  }
-  
-  //  EVERY_N_MILLISECONDS(2000) {
-  //    flash();
-  //  }
-
-  show_at_max_brightness_for_power();
-}
-
-//void flash() {
+void flash() {
 //  int ledstart = random16(NUM_LEDS);           // Determine starting location of flash
 //  int ledlen = random8(NUM_LEDS - ledstart);  // Determine length of flash (not to go beyond NUM_LEDS-1)
 //  fill_solid(leds, NUM_LEDS, CHSV(255, 0, 200));
 //  FastLED.show();
 //  fadeToBlackBy(leds, NUM_LEDS, 500);
 //  FastLED.show();
-//}
+}
 
 int numberOfSparkles = 1;
 int increasing = true;
 
-void confetti() {                                             // ranvdom colored speckles that blink in and fade smoothly
+void confetti() {   
+
+  
+  // ranvdom colored speckles that blink in and fade smoothly
   fadeToBlackBy(leds, NUM_LEDS, thisfade);                    // Low values = slower fade.
 
-  if (numberOfSparkles < 40 && increasing) {
+  if (numberOfSparkles < 300 && increasing) {
     numberOfSparkles += 1;
   } else if (numberOfSparkles > 0) {
     numberOfSparkles -= 1;
@@ -101,8 +101,11 @@ void confetti() {                                             // ranvdom colored
   int pos;
   for (int i = 0; i < numberOfSparkles; i++) {
     pos = random16(NUM_LEDS);                               // Pick an LED at random.
-    //    leds[pos] += CHSV((thishue + random16(huediff)) / 4 , thissat, thisbri); // I use 12 bits for hue so that the hue increment isn't too quick.
-    leds[pos] = CHSV(thishue, thissat, thisbri);
+    if (rainbow) {
+    leds[pos] += CHSV((thishue + random16(huediff)) / 4 , thissat, thisbri); // I use 12 bits for hue so that the hue increment isn't too quick.
+    } else {
+      leds[pos] = CHSV(thishue + (pos / 10), thissat, thisbri);
+    }
   }
 
 
@@ -123,3 +126,22 @@ void ChangeMe() {                                             // A time (rather 
   //    }
   //  }
 }
+
+
+void loop () {
+
+  confetti();
+
+  //  EVERY_N_MILLISECONDS(1000) {                           // FastLED based non-blocking delay to update/display the sequence.
+  //    ChangeMe();                                           // Check the demo loop for changes to the variables.
+  //    confetti();
+  //  }
+  
+  //  EVERY_N_MILLISECONDS(2000) {
+  //    flash();
+  //  }
+
+  show_at_max_brightness_for_power();
+}
+
+

@@ -21,7 +21,7 @@
 //#define LED_CK 11
 #define COLOR_ORDER GRB                                       // It's GRB for WS2812B and BGR for APA102
 #define LED_TYPE WS2812B                                       // What kind of strip are you using (WS2801, WS2812B or APA102)?
-#define NUM_LEDS 590                                           // Number of LED's.
+#define NUM_LEDS 1500                                           // Number of LED's.
 
 // Initialize changeable global variables.
 uint8_t max_bright = 255;                                     // Overall brightness definition. It can be changed on the fly.
@@ -42,7 +42,7 @@ void setup() {
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);          // Use this for WS2812B
   //  LEDS.addLeds<LED_TYPE, LED_DT, LED_CK, COLOR_ORDER>(leds, NUM_LEDS);  // Use this for WS2801 or APA102
   FastLED.setBrightness(max_bright);
-  set_max_power_in_volts_and_milliamps(5, 7000);                // FastLED 2.1 Power management set at 5V, 500mA
+  set_max_power_in_volts_and_milliamps(5, 4000);                // FastLED 2.1 Power management set at 5V, 500mA
 }
 
 bool allWhite = false;

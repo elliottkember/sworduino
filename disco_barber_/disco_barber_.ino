@@ -1,0 +1,64 @@
+#define qsubd(x, b)  ((x>b)?wavebright:0)                     // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
+#define qsuba(x, b)  ((x>b)?x-b:0)                            // Analog Unsigned subtraction macro. if result <0, then => 0
+
+#include "FastLED.h"                                          // FastLED library.
+
+#if FASTLED_VERSION < 3001000
+#error "Requires FastLED 3.1 or later; check github for latest code."
+#endif
+
+// Fixed definitions cannot change on the fly.
+// Fixed definitions cannot change on the fly.
+#define LED_DT     7
+#define COLOR_ORDER GRB
+#define LED_TYPE     WS2812B
+#define NUM_LEDS    1500
+
+struct CRGB leds[NUM_LEDS];                                   // Initialize our LED array.
+
+uint8_t max_bright = 255;                                     // Overall brightness definition. It can be changed on the fly.
+
+// Initialize changeable global variables. Play around with these!!!
+uint8_t wavebright = 255;                                     // You can change the brightness of the waves/bars rolling across the screen.
+uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
+uint8_t thisrot = 1;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
+uint8_t allsat = 240;                                         // I like 'em fully saturated with colour.
+int8_t thisspeed = 48;                                         // You can change the speed of the wave, and use negative values.
+uint8_t allfreq = 3;                                         // You can change the frequency, thus distance between bars.
+int thisphase = 0;                                            // Phase change value gets calculated.
+uint8_t thiscutoff = 120;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+int thisdelay = 0;                                           // You can change the delay. Also you can change the allspeed variable above.
+uint8_t bgclr = 0;                                            // A rotating background colour.
+uint8_t bgbri = 0;                                           // Brightness of background colour
+
+void setup() {
+  Serial.begin(57600);
+  delay(2000);
+  LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
+  FastLED.setBrightness(max_bright);
+  set_max_power_in_volts_and_milliamps(5.5, 7000);               // FastLED Power management set at 5V, 500mA
+}
+
+void one_sine() {                                                             // This is the heart of this program. Sure is short.
+  thisphase += thisspeed;                                                     // You can change direction and speed individually.
+  thishue = thishue + thisrot;                                                // Hue rotation is fun for thiswave.
+  for (int k = 0; k < NUM_LEDS - 1; k++) {                                    // For each of the LED's in the strand, set a brightness based on a wave as follows:
+    int thisbright = qsubd(cubicwave8((k * allfreq) + thisphase), thiscutoff); // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    leds[k] = CHSV(bgclr, 255, bgbri);                                        // First set a background colour, but fully saturated.
+    
+    // Sparkles!
+    if (random(1000) > 997) {
+      leds[k] = CHSV(255, 0, 255);
+    }
+    
+    leds[k] += CHSV(thishue * 5 + k / 4, allsat, thisbright);                       // Then assign a hue to any that are bright enough.
+  }
+  bgclr++;                                                                    // You can change the background colour or remove this and leave it fixed.
+}
+
+void loop () {
+  EVERY_N_MILLISECONDS(thisdelay) {                           // FastLED based non-blocking delay to update/display the sequence.
+    one_sine();
+  }
+  show_at_max_brightness_for_power();
+}
