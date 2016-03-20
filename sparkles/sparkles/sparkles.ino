@@ -33,60 +33,36 @@ struct CRGB leds[NUM_LEDS];                                   // Initialize our 
 unsigned long previousMillis;                                 // Store last time the strip was updated.
 
 // Define variables used by the sequences.
-uint8_t  thisfade = 200;                                        // How quickly does it fade? Lower = slower fade rate.
+uint8_t  thisfade = 200;                                      // How quickly does it fade? Lower = slower fade rate.
 int       thishue = 50;                                       // Starting hue.
-uint8_t   thisinc = 20;                                        // Incremental value for rotating hues
+uint8_t   thisinc = 1;                                        // Incremental value for rotating hues
 uint8_t   thissat = 240;                                      // The saturation, where 255 = brilliant colours.
 uint8_t   thisbri = 255;                                      // Brightness of a sequence. Remember, max_bright is the overall limiter.
 int       huediff = 256;                                      // Range of random #'s to use for hue
 uint8_t thisdelay = 0;                                        // We don't need much delay (if any)
 
-const     rainbow = true;
+bool   rainbow = false;
+bool   rainbow2 = false;
 
 const int ledPin = 13;
 const int led = 13;
 
 void setup() {
-
-  pinMode(led, OUTPUT);     
-  digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(1000);               // wait for a second
-  digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);               // wait for a second
-
-  pinMode(ledPin, OUTPUT);
-  
-  delay(3000);                                                // Power-up safety delay or something like that.
+  delay(3000);
   Serial.begin(57600);
-
-  LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);    // Use this for WS2812B
-  //  LEDS.addLeds<LED_TYPE, LED_DT, LED_CK, COLOR_ORDER>(leds, NUM_LEDS);  // Use this for WS2801 or APA102
-
+  LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(max_bright);
-  set_max_power_in_volts_and_milliamps(5, 4000);               // FastLED power management set at 5V, 500mA.
-}
-
-void flash() {
-//  int ledstart = random16(NUM_LEDS);           // Determine starting location of flash
-//  int ledlen = random8(NUM_LEDS - ledstart);  // Determine length of flash (not to go beyond NUM_LEDS-1)
-//  fill_solid(leds, NUM_LEDS, CHSV(255, 0, 200));
-//  FastLED.show();
-//  fadeToBlackBy(leds, NUM_LEDS, 500);
-//  FastLED.show();
+  set_max_power_in_volts_and_milliamps(5, 10000);
 }
 
 int numberOfSparkles = 1;
 int increasing = true;
 
-void confetti() {   
-
-  
-  // ranvdom colored speckles that blink in and fade smoothly
-  fadeToBlackBy(leds, NUM_LEDS, thisfade);                    // Low values = slower fade.
-
-  if (numberOfSparkles < 300 && increasing) {
+void confetti() {
+  fadeToBlackBy(leds, NUM_LEDS, thisfade);
+  if (numberOfSparkles < 40 && increasing) {
     numberOfSparkles += 1;
-  } else if (numberOfSparkles > 0) {
+  } else if (numberOfSparkles > 5) {
     numberOfSparkles -= 1;
     increasing = false;
   } else {
@@ -94,53 +70,22 @@ void confetti() {
     numberOfSparkles += 1;
   }
 
-  //  if (numberOfSparkles == 0) {
-  //    flash();
-  //  }
-
   int pos;
-  for (int i = 0; i < numberOfSparkles; i++) {
-    pos = random16(NUM_LEDS);                               // Pick an LED at random.
+  for (int i = 0; i < numberOfSparkles * 8; i++) {
+    pos = random16(NUM_LEDS);
     if (rainbow) {
-    leds[pos] += CHSV((thishue + random16(huediff)) / 4 , thissat, thisbri); // I use 12 bits for hue so that the hue increment isn't too quick.
-    } else {
+      leds[pos] += CHSV((thishue + random16(huediff)) / 4 , thissat, thisbri);
+    } else if(rainbow2) {
       leds[pos] = CHSV(thishue + (pos / 10), thissat, thisbri);
+    } else {
+      leds[pos] = CHSV(thishue, thissat, thisbri);
     }
   }
-
-
-  thishue = thishue + thisinc;                                // It increments here.
+  thishue = thishue + thisinc;
 }
-
-
-void ChangeMe() {                                             // A time (rather than loop) based demo sequencer. This gives us full control over the length of each sequence.
-  //  uint8_t secondHand = (millis() / 1000) % 15;                // IMPORTANT!!! Change '15' to a different value to change duration of the loop.
-  //  static uint8_t lastSecond = 99;                             // Static variable, means it's only defined once. This is our 'debounce' variable.
-  //  if (lastSecond != secondHand) {                             // Debounce to make sure we're not repeating an assignment.
-  //    lastSecond = secondHand;
-  //    switch(secondHand) {
-  //      case  0: thisinc=1; thishue=192; thissat=255; thisfade=2; huediff=256; break;  // You can change values here, one at a time , or altogether.
-  //      case  5: thisinc=2; thishue=128; thisfade=8; huediff=64; break;
-  //      case 10: thisinc=1; thishue=random16(255); thisfade=1; huediff=16; break;      // Only gets called once, and not continuously for the next several seconds. Therefore, no rainbows.
-  //      case 15: break;                                                                // Here's the matching 15 for the other one.
-  //    }
-  //  }
-}
-
 
 void loop () {
-
   confetti();
-
-  //  EVERY_N_MILLISECONDS(1000) {                           // FastLED based non-blocking delay to update/display the sequence.
-  //    ChangeMe();                                           // Check the demo loop for changes to the variables.
-  //    confetti();
-  //  }
-  
-  //  EVERY_N_MILLISECONDS(2000) {
-  //    flash();
-  //  }
-
   show_at_max_brightness_for_power();
 }
 
