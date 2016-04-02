@@ -15,7 +15,7 @@ struct CRGB leds[NUM_LEDS];                                   // Initialize our 
 unsigned long previousMillis;                                 // Store last time the strip was updated.
 
 // Define variables used by the sequences.
-uint8_t  thisfade = 200;                                      // How quickly does it fade? Lower = slower fade rate.
+uint8_t  thisfade = 120;                                      // How quickly does it fade? Lower = slower fade rate.
 int       thishue = 50;                                       // Starting hue.
 uint8_t   thisinc = 1;                                        // Incremental value for rotating hues
 uint8_t   thissat = 240;                                      // The saturation, where 255 = brilliant colours.
@@ -25,26 +25,31 @@ uint8_t thisdelay = 0;                                        // We don't need m
 
 #define RAINBOW 1
 #define RAINBOW_2 2
-#define RAINBOW_3 2
-#define DISCO_BARBER_1 3
-#define DISCO_BARBER_2 4
-#define JUGGLE 5
+#define RAINBOW_3 3
+#define DISCO_BARBER_1 4
+#define DISCO_BARBER_2 5
+#define JUGGLE 6
+#define SNAKES 7
+#define PIROUETTE 8
+int maxPatternId = 8;
 
-int maxPatternId = 4;
-int patternId = random(maxPatternId);
-
-// bool   rainbow = false;
-// bool   rainbow2 = false;
+const bool holdPattern = false;
+int patternId; // = SNAKES;
 
 const int ledPin = 13;
 const int led = 13;
 
+
 void setup() {
-  delay(3000);
+  delay(2000);
   Serial.begin(57600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(max_bright);
-  set_max_power_in_volts_and_milliamps(5, 10000);
+  set_max_power_in_volts_and_milliamps(5, 4000);
+  randomSeed(analogRead(0));
+  if (!holdPattern) {
+    patternId = random(maxPatternId);
+  }
 }
 
 int numberOfSparkles = 1;
@@ -52,7 +57,7 @@ int increasing = true;
 
 void confetti() {
   fadeToBlackBy(leds, NUM_LEDS, thisfade);
-  if (numberOfSparkles < 40 && increasing) {
+  if (numberOfSparkles < 20 && increasing) {
     numberOfSparkles += 1;
   } else if (numberOfSparkles > 5) {
     numberOfSparkles -= 1;
@@ -63,10 +68,18 @@ void confetti() {
   }
 
   int pos;
+
+  if (patternId == RAINBOW) {
+    for (int i = 0; i < 5; i++) {
+      pos = random16(NUM_LEDS);
+      leds[pos] += CHSV(thishue, 180, 255);
+    }
+  }
+
   for (int i = 0; i < numberOfSparkles * 8; i++) {
     pos = random16(NUM_LEDS);
     if (patternId == RAINBOW) {
-      leds[pos] += CHSV((thishue + random16(huediff)) / 4 , thissat, thisbri);
+      leds[pos] += CHSV(thishue, 100, 20);
     } else if (patternId == RAINBOW_2) {
       leds[pos] = CHSV(thishue + (pos / 10), thissat, thisbri);
     } else if (patternId == RAINBOW_3) {
@@ -109,6 +122,51 @@ uint8_t thiscutoff = 120;                                     // You can change 
 uint8_t bgclr = 0;                                            // A rotating background colour.
 uint8_t bgbri = 0;
 
+int chainStart;
+int chainColor;
+
+int currentChain = 0;
+#define MAX_CHAINS 3
+int heads[MAX_CHAINS];
+int colors[MAX_CHAINS];
+int fadeRate = 100;
+#define MAX_LENGTH 400
+
+void newSnake() {
+  chainColor += 20;
+  currentChain += 1;
+  if (currentChain > MAX_CHAINS) {
+    currentChain = 0;
+  }
+  chainStart = 0;
+  heads[currentChain] = chainStart;
+}
+
+void snakes() {
+  EVERY_N_MILLISECONDS(1200) {
+    newSnake();
+  }
+
+  int numberOfSnakes = MAX_CHAINS;
+  fadeToBlackBy(leds, NUM_LEDS, 400);
+  for (int i = 0; i < 40; i++) {
+    for (int h = 0; h < numberOfSnakes; h++) {
+      int chainStart = heads[h];
+      chainStart += 1;
+      int offset = 0; random(millis()) * 55;
+      if (chainStart > NUM_LEDS) {
+        newSnake();
+      }
+      if (chainStart < NUM_LEDS) {
+        leds[chainStart] = CHSV(chainColor + i, (255 - 55) + offset - random(50), 255);
+        heads[h] = chainStart;
+      } else {
+        heads[h] = 0;
+      }
+    }
+  }
+}
+
 void discoBarber() {
   thisphase += thisspeed;                                                     // You can change direction and speed individually.
   thishue = thishue + thisrot;                                                // Hue rotation is fun for thiswave.
@@ -122,7 +180,7 @@ void discoBarber() {
     }
 
     if (patternId == DISCO_BARBER_1) {
-      leds[k] += CHSV(thishue+k/5, allsat, thisbright);                             // Then assign a hue to any that are bright enough.
+      leds[k] += CHSV(thishue + k / 5, allsat, thisbright);                         // Then assign a hue to any that are bright enough.
     } else {
       leds[k] += CHSV(thishue * 5 + k / 4, allsat, thisbright);                       // Then assign a hue to any that are bright enough.
     }
@@ -130,11 +188,63 @@ void discoBarber() {
   bgclr++;
 }
 
+
+
+void newPirouette() {
+  chainColor = random(255);
+  currentChain += 1;
+  if (currentChain > MAX_CHAINS) {
+    currentChain = 0;
+  }
+  //    chainStart = random(1, 5);
+  if (chainStart == 1) {
+    chainStart = 0;
+  } else {
+    chainStart = 1;
+  }
+  heads[currentChain] = chainStart;
+  colors[currentChain] = chainColor; // CHSV(chainColor, 255, 255);
+}
+
+int pirouetteFadeRate = random(200) + 100;
+
+void pirouette () {
+  EVERY_N_MILLISECONDS(1200) {
+    newPirouette();
+  }
+    EVERY_N_MILLISECONDS(870) {
+    newPirouette();
+  }
+    EVERY_N_MILLISECONDS(330) {
+    newPirouette();
+  }
+
+  EVERY_N_MILLISECONDS(100) {
+    pirouetteFadeRate += 1;
+  }
+
+  int numberOfSnakes = MAX_CHAINS;
+  fadeToBlackBy(leds, NUM_LEDS, pirouetteFadeRate);
+  for (int i = 0; i < 20; i++) {
+    for (int h = 0; h < numberOfSnakes; h++) {
+      int chainStart = heads[h];
+      chainStart += 2;
+//      if (chainStart > NUM_LEDS) {
+//        newPirouette();
+//      }
+      if (chainStart < NUM_LEDS) {
+        leds[chainStart] = CHSV(colors[h], 255, 255);
+        heads[h] = chainStart;
+      }
+    }
+  }
+}
+
 void loop () {
-  EVERY_N_MILLISECONDS(30000) {
-    patternId += 1;
-    if (patternId > maxPatternId) {
-      patternId = 1;
+  if (!holdPattern) {
+    EVERY_N_MILLISECONDS(7000) {
+      patternId = random(maxPatternId);
+      Serial.println(patternId);
     }
   }
 
@@ -144,6 +254,10 @@ void loop () {
     discoBarber();
   } else if (patternId == JUGGLE) {
     juggle();
+  } else if (patternId == SNAKES) {
+    snakes();
+  } else if (patternId == PIROUETTE) {
+    pirouette();
   }
   show_at_max_brightness_for_power();
 }
