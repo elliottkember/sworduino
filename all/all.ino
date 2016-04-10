@@ -29,12 +29,12 @@ uint8_t thisdelay = 0;                                        // We don't need m
 #define DISCO_BARBER_1 3
 #define DISCO_BARBER_2 4
 #define JUGGLE 5
+#define NEW 6
 
-int maxPatternId = 4;
-int patternId = random(maxPatternId);
-
-// bool   rainbow = false;
-// bool   rainbow2 = false;
+int maxPatternId = 5;
+int patternId = random(maxPatternId - 1);
+bool holdPattern = false;
+int rotationInMillseconds = 20000;
 
 const int ledPin = 13;
 const int led = 13;
@@ -63,16 +63,29 @@ void confetti() {
   }
 
   int pos;
+
+  if (patternId == RAINBOW) {
+    for (int i = 0; i < 2; i++) {
+      pos = random16(NUM_LEDS);
+      leds[pos] += CHSV(thishue, 255, 255);
+    }
+  }
+
   for (int i = 0; i < numberOfSparkles * 8; i++) {
     pos = random16(NUM_LEDS);
     if (patternId == RAINBOW) {
-      leds[pos] += CHSV((thishue + random16(huediff)) / 4 , thissat, thisbri);
+      leds[pos] += CHSV(thishue, 255, 20);
     } else if (patternId == RAINBOW_2) {
       leds[pos] = CHSV(thishue + (pos / 10), thissat, thisbri);
     } else if (patternId == RAINBOW_3) {
       leds[pos] = CHSV(thishue, thissat, thisbri);
     }
   }
+
+  if (patternId == RAINBOW_2) {
+    thishue += thisinc * 10;
+  }
+  
   thishue = thishue + thisinc;
 }
 
@@ -90,9 +103,12 @@ uint8_t   basebeat =   48;                                     // Higher = faste
 
 void juggle() {
   fadeToBlackBy(leds, NUM_LEDS, faderate);
-  numdots = 4; basebeat = 48; hueinc = 2; faderate = 48; thishue = 128;
+  numdots = 3; basebeat = 2; hueinc = 1; faderate = 48; thishue = 128;
   for ( int i = 0; i < numdots; i++) {
-    leds[beatsin16(basebeat + i + numdots, 0, NUM_LEDS)] += CHSV(curhue, thissat, thisbright); //beat16 is a FastLED 3.1 function
+    for ( int j = 0; j < 20; j++) {
+      leds[beatsin16(basebeat + i + numdots, 0, NUM_LEDS - 20) + j] += CHSV(curhue, thissat, thisbright); //beat16 is a FastLED 3.1 function  
+    }
+//    leds[beatsin16(basebeat + i + numdots, 0, NUM_LEDS)] += CHSV(curhue, thissat, thisbright); //beat16 is a FastLED 3.1 function
     curhue += hueinc;
   }
 }
@@ -124,17 +140,31 @@ void discoBarber() {
     if (patternId == DISCO_BARBER_1) {
       leds[k] += CHSV(thishue+k/5, allsat, thisbright);                             // Then assign a hue to any that are bright enough.
     } else {
-      leds[k] += CHSV(thishue * 5 + k / 4, allsat, thisbright);                       // Then assign a hue to any that are bright enough.
+      leds[k] += CHSV(- (thishue * 20) + k / 4, allsat, thisbright);                       // Then assign a hue to any that are bright enough.
     }
   }
   bgclr++;
 }
 
+void newPattern() {
+  int i = 0;
+  for (int k = 0; k < NUM_LEDS; k++) {
+    int colour = k; //  + i;
+    leds[k + i] = CHSV(colour, 255, 255);
+  }
+  i++;
+  if (i > NUM_LEDS) {
+    i = 0;
+  }
+}
+
 void loop () {
-  EVERY_N_MILLISECONDS(30000) {
-    patternId += 1;
-    if (patternId > maxPatternId) {
-      patternId = 1;
+  if (!holdPattern) {
+    EVERY_N_MILLISECONDS(rotationInMillseconds) {
+      patternId += 1;
+      if (patternId > maxPatternId) {
+        patternId = 1;
+      }
     }
   }
 
@@ -145,6 +175,9 @@ void loop () {
   } else if (patternId == JUGGLE) {
     juggle();
   }
+//  else if (patternId == NEW) {
+//    newPattern();
+//  }
   show_at_max_brightness_for_power();
 }
 
