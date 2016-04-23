@@ -1,49 +1,44 @@
-uint8_t wavebright = 255;                                     // You can change the brightness of the waves/bars rolling across the screen.
-#define qsubd(x, b)  ((x>b)?wavebright:0)                     // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
-#define qsuba(x, b)  ((x>b)?x-b:0)                            // Analog Unsigned subtraction macro. if result <0, then => 0
+uint8_t wavebright = 255;                  // You can change the brightness of the waves/bars rolling across the screen.
+#define qsubd(x, b)  ((x>b)?wavebright:0)  // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
+#define qsuba(x, b)  ((x>b)?x-b:0)         // Analog Unsigned subtraction macro. if result <0, then => 0
 
 #include "FastLED.h"
-#define LED_DT 7                                             // Data pin to connect to the strip.
-#define COLOR_ORDER GRB                                       // Are they RGB, GRB or what??
-#define LED_TYPE WS2812B                                       // Don't forget to change LEDS.addLeds
-#define NUM_LEDS 1500                                           // Number of LED's.
-struct CRGB leds[NUM_LEDS];                                   // Initialize our LED array.
+#define LED_DT 7              // Data pin to connect to the strip.
+#define COLOR_ORDER GRB       // Are they RGB, GRB or what??
+#define LED_TYPE WS2812B      // Don't forget to change LEDS.addLeds
+#define NUM_LEDS 1500         // Number of LED's.
+struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
+uint8_t max_bright = 255;     // Overall brightness definition. It can be changed on the fly.
+unsigned long previousMillis; // Store last time the strip was updated.
+int hue = 50;                 // Starting hue.
+bool firstTimeRunningThroughPattern = false;
 
-uint8_t max_bright = 255;                                      // Overall brightness definition. It can be changed on the fly.
-unsigned long previousMillis;                                 // Store last time the strip was updated.
-
-int hue = 50;                                       // Starting hue.
-
-// This variable is set the first run-through of every pattern. Use it for setup!
-bool firstRun = false;
-
-// Patterns
 #define NIGHT_SPARKLES 1
 #define BEAUTIFUL_SPARKLES 2
-#define SINGLE_COLOR_SPARKLES 3
+#define DISCO_BARBER_2 3
 #define DISCO_BARBER_1 4
-#define DISCO_BARBER_2 5
+#define SINGLE_COLOR_SPARKLES 5
 #define WORMS 6
-#define NEW 7
+#define PARTY 7
+//#define SIREN 8
+#define DISCO_TWIRL 8
 
-int maxPatternId = 6;
-int rotationInMillseconds = 2000; // 20 seconds for production
+int maxPatternId = 8;
+int rotationInMillseconds = 20000; // 20 seconds for production
 
-
-//bool holdPattern = false;
+// Either A)
 bool holdPattern = true;
-//int patternId = 2;
-int patternId = SINGLE_COLOR_SPARKLES;
-
-const int ledPin = 13;
-const int led = 13;
+int patternId = DISCO_TWIRL;
+// OR B)
+//bool holdPattern = false;
+//int patternId = NIGHT_SPARKLES;
 
 void setup() {
   delay(3000);
   Serial.begin(57600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(max_bright);
-  set_max_power_in_volts_and_milliamps(5, 10000);
+  set_max_power_in_volts_and_milliamps(5, 12000);
   randomSeed(analogRead(0));
 }
 
@@ -76,23 +71,24 @@ void nightSparkles() {
   hue = hue + 1;
 }
 
+void beautifulSparkles() {
+  fadeToBlackBy(leds, NUM_LEDS, 200);
+  numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
+  for (int i = 0; i < numberOfSparkles * 4; i++) {
+    int pos = random16(NUM_LEDS);
+    leds[pos] = CHSV(hue + (pos / 10), 240, 255);
+  }
+  hue += 10;
+}
+
 void sparkles() {
   fadeToBlackBy(leds, NUM_LEDS, 200);
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
   for (int i = 0; i < numberOfSparkles * 4; i++) {
     int pos = random16(NUM_LEDS);
-    if (patternId == BEAUTIFUL_SPARKLES) {
-      leds[pos] = CHSV(hue + (pos / 10), 240, 255);
-    } else if (patternId == SINGLE_COLOR_SPARKLES) {
-      leds[pos] = CHSV(hue, 240, 255);
-    }
+    leds[pos] = CHSV(hue, 240, 255);
   }
-
-  if (patternId == BEAUTIFUL_SPARKLES) {
-    hue += 10;
-  } else {
-    hue = hue + 1;
-  }
+  hue += 1;
 }
 
 uint8_t numberOfWorms = 3;
@@ -145,12 +141,87 @@ void discoBarber() {
       leds[k] += CHSV(hue * -20 + k / 4, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
     }
   }
- }
+}
+
+int partySeed;
+int partySeedDirection = true;
+
+void party() {
+  int partySeedLength = 200;
+  if (firstTimeRunningThroughPattern) {
+    partySeed = 0;
+  } else {
+    partySeed += partySeedDirection ? 20 : -20;
+    if (partySeed > NUM_LEDS - partySeedLength) {
+      partySeedDirection = false;
+    } else if (partySeed < 0) {
+      partySeedDirection = true;
+    }
+  }
+  EVERY_N_MILLISECONDS(500) {
+    hue += 33;
+  }
+  fadeToBlackBy(leds, NUM_LEDS, 120);
+  int brightness = 255;
+  int saturation = 200;
+  int pos = random(partySeed - partySeedLength, partySeed + partySeedLength);
+  
+  for (int i = pos; i <= pos + 50; i++) {
+    brightness *= 0.97;
+    if (i < NUM_LEDS && i > 0) {
+      leds[i] = CHSV(hue, saturation, brightness);
+    }
+  }
+  brightness = 255;
+  saturation = 255;
+  for (int j = pos; j >= pos - 50; j--) {
+    brightness *= 0.97;
+    if (j < NUM_LEDS && j > 0) {
+      leds[j] = CHSV(hue, saturation, brightness);
+    }
+  }
+}
+
+uint8_t sirenHue = 0;                                          // Starting hue value.
+int8_t sirenRotation = 10;                                           // Hue rotation speed. Includes direction.
+uint8_t sirenDeltahue = 10;                                         // Hue change between pixels.
+bool sirenDirection = 0;                                             // I use a direction variable, so I can plug into inputs in a standar fashion.
+
+void siren() {
+  if (sirenDirection == 0) sirenHue += sirenRotation; else sirenHue -= sirenRotation; // I could use signed math, but 'thisdir' works with other routines. 
+  sirenDeltahue = 1; 
+  sirenRotation = 30;
+  fill_rainbow(leds, NUM_LEDS, sirenHue, sirenDeltahue);
+}
+
+uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
+uint8_t thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
+uint8_t allsat = 255;                                         // I like 'em fully saturated with colour.
+bool thisdir = 0;                                             // You can change direction.
+int8_t thisspeed = 32;                                         // You can change the speed, and use negative values.
+uint8_t allfreq = 32;                                         // You can change the frequency, thus overall width of bars.
+int thisphase = 0;                                            // Phase change value gets calculated.
+uint8_t thiscutoff = 192;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+int thisdelay = 20;                                           // You can change the delay. Also you can change the allspeed variable above. 
+uint8_t bgclr = 0;                                            // A rotating background colour.
+uint8_t bgbri = 16;                                           // Don't go below 16.
+// End of resetvar() redefinitions.
+
+void discoTwirl() {
+  //  if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
+  thisphase += thisspeed;
+  thishue += thisrot;                                                         // Hue rotation is fun for thiswave.
+  for (int k=0; k<NUM_LEDS-1; k++) {
+    int thisbright = qsubd(cubicwave8((k*allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    leds[k] = CHSV(bgclr, 255, bgbri);
+    leds[k] += CHSV(thishue + k, allsat, thisbright);                               // Assigning hues and brightness to the led array.
+  }
+}
 
 void loop () {
   if (!holdPattern) {
     EVERY_N_MILLISECONDS(rotationInMillseconds) {
-      firstRun = true;
+      firstTimeRunningThroughPattern = true;
       patternId += 1;
       if (patternId > maxPatternId) {
         patternId = 1;
@@ -160,15 +231,23 @@ void loop () {
 
   if (patternId == NIGHT_SPARKLES) {
     nightSparkles();
-  } else if (patternId == BEAUTIFUL_SPARKLES || patternId == SINGLE_COLOR_SPARKLES) {
+  } else if (patternId == BEAUTIFUL_SPARKLES) {
+    beautifulSparkles();
+  } else if (patternId == SINGLE_COLOR_SPARKLES) {
     sparkles();
   } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
     discoBarber();
   } else if (patternId == WORMS) {
     worms();
+  } else if (patternId == PARTY) {
+    party();
+  } else if (patternId == SIREN) {
+    siren();
+  } else if (patternId == DISCO_TWIRL) {
+    discoTwirl();
   }
 
-  firstRun = false;
+  firstTimeRunningThroughPattern = false;
 
   show_at_max_brightness_for_power();
 }
