@@ -23,7 +23,7 @@ bool firstRun = false;
 #define SINGLE_COLOR_SPARKLES 3
 #define DISCO_BARBER_1 4
 #define DISCO_BARBER_2 5
-#define JUGGLE 6
+#define WORMS 6
 #define NEW 7
 
 int maxPatternId = 6;
@@ -48,7 +48,7 @@ void setup() {
 }
 
 int numberOfSparkles = 1;
-int increasing = true;
+bool increasing = true;
 
 int upAndDownBy(int value, int difference) {
   if (value < 80 && increasing) {
@@ -95,50 +95,41 @@ void sparkles() {
   }
 }
 
-uint8_t    numdots = 3;    // Number of dots in use.
-uint8_t   faderate = 64;  // How long should the trails be. Very low value = longer trails.
-uint8_t     hueinc = 1;   // Incremental change in hue between each dot.
-uint8_t     curhue = 0;    // The current hue
-uint8_t   basebeat = 2;   // Higher = faster movement.
+uint8_t numberOfWorms = 3;
+uint8_t wormsFadeRate = 64; // Very low value = longer trails.
+uint8_t wormsHueIncrement = 1; // Incremental change in hue between each dot.
+uint8_t wormsStartingHue = 0; // The current hue
+uint8_t wormsBaseBeat = 2; // Higher = faster movement.
 
-void juggle() {
-  hueinc = 1;
-  faderate = 64;
-  if (faderate == 100 || faderate == 200) {
-    numdots += 1;
-  }
-
-  fadeToBlackBy(leds, NUM_LEDS, faderate);
-
-  for ( int i = 0; i < numdots; i++) {
+void worms() {
+  fadeToBlackBy(leds, NUM_LEDS, wormsFadeRate);
+  for ( int i = 0; i < numberOfWorms; i++) {
     for ( int j = 0; j < 20; j++) {
-      leds[beatsin16(basebeat + i + numdots, 0, NUM_LEDS - 20) + j] += CHSV(curhue, 240, 255); //beat16 is a FastLED 3.1 function
+      leds[beatsin16(wormsBaseBeat + i + numberOfWorms, 0, NUM_LEDS - 20) + j] += CHSV(wormsStartingHue, 240, 255);
     }
-    // leds[beatsin16(basebeat + i + numdots, 0, NUM_LEDS)] += CHSV(curhue, 240, 255); //beat16 is a FastLED 3.1 function
-    curhue += hueinc;
+    wormsStartingHue += wormsHueIncrement;
   }
 }
 
-uint8_t allfreq = 3;
-int     thisphase = 0;
-uint8_t thiscutoff = 120;
-uint8_t thisrot = 1;
-int8_t  thisspeed = 48;
-uint8_t allsat = 240;
+uint8_t discoBarberFrequency = 3;
+int     discoBarberPhase = 0;
+uint8_t discoBarberCutoff = 120;
+uint8_t discoBarberSaturation = 240;
 
 void discoBarber() {
   if (patternId == DISCO_BARBER_1) {
-    allfreq = 5;
-    thisphase += 24;
+    discoBarberFrequency = 5;
+    discoBarberPhase += 24;
   } else {
-    allfreq = 3;
-    thisphase += 48;
+    discoBarberFrequency = 3;
+    discoBarberPhase += 48;
   }
 
-  hue = hue + 1;                                                // Hue rotation is fun for thiswave.
+  hue = hue + 1;
 
-  for (int k = 0; k < NUM_LEDS - 1; k++) {                                    // For each of the LED's in the strand, set a brightness based on a wave as follows:
-    int _brightness = qsubd(cubicwave8((k * allfreq) + thisphase), thiscutoff); // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+  for (int k = 0; k < NUM_LEDS - 1; k++) {
+    // qsub sets a minimum value called discoBarberCutoff. If < discoBarberCutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    int _brightness = qsubd(cubicwave8((k * discoBarberFrequency) + discoBarberPhase), discoBarberCutoff);
     leds[k] = CHSV(0, 0, 0);                                        // First set a background colour, but fully saturated.
 
     // Sparkles!
@@ -148,10 +139,10 @@ void discoBarber() {
 
     if (patternId == DISCO_BARBER_1) {
       // original disco barber 1
-      // leds[k] += CHSV(hue+k/5, allsat, _brightness);                             // Then assign a hue to any that are bright enough.
-      leds[k] += CHSV(hue * 10 + k / 2, allsat, _brightness);                             // Then assign a hue to any that are bright enough.
+      // leds[k] += CHSV(hue+k/5, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
+      leds[k] += CHSV(hue * 10 + k / 2, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
     } else {
-      leds[k] += CHSV(hue * -20 + k / 4, allsat, _brightness);                       // Then assign a hue to any that are bright enough.
+      leds[k] += CHSV(hue * -20 + k / 4, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
     }
   }
  }
@@ -173,8 +164,8 @@ void loop () {
     sparkles();
   } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
     discoBarber();
-  } else if (patternId == JUGGLE) {
-    juggle();
+  } else if (patternId == WORMS) {
+    worms();
   }
 
   firstRun = false;
