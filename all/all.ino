@@ -18,22 +18,22 @@ int hue = 50;                                       // Starting hue.
 bool firstRun = false;
 
 // Patterns
-#define RAINBOW 1
-#define RAINBOW_2 2
-#define RAINBOW_3 3
+#define NIGHT_SPARKLES 1
+#define BEAUTIFUL_SPARKLES 2
+#define SINGLE_COLOR_SPARKLES 3
 #define DISCO_BARBER_1 4
 #define DISCO_BARBER_2 5
 #define JUGGLE 6
 #define NEW 7
 
 int maxPatternId = 6;
-int rotationInMillseconds = 20000; // 20 seconds for production
+int rotationInMillseconds = 2000; // 20 seconds for production
 
 
-//int patternId = 3;
 //bool holdPattern = false;
 bool holdPattern = true;
-int patternId = RAINBOW;
+//int patternId = 2;
+int patternId = SINGLE_COLOR_SPARKLES;
 
 const int ledPin = 13;
 const int led = 13;
@@ -50,45 +50,45 @@ void setup() {
 int numberOfSparkles = 1;
 int increasing = true;
 
-void confetti() {
-
-  if (patternId == RAINBOW) {
-    fadeToBlackBy(leds, NUM_LEDS, 180);
-  } else {
-    fadeToBlackBy(leds, NUM_LEDS, 200);
-  }
-  
-  if (numberOfSparkles < 80 && increasing) {
-    numberOfSparkles += 1;
-  } else if (numberOfSparkles > 5) {
-    numberOfSparkles -= 1;
+int upAndDownBy(int value, int difference) {
+  if (value < 80 && increasing) {
+    value += difference;
+  } else if (value > 5) {
+    value -= difference;
     increasing = false;
   } else {
     increasing = true;
-    numberOfSparkles += 1;
+    value += difference;
   }
+  return value;
+}
 
-  int pos;
-
-  if (patternId == RAINBOW) {
-    for (int i = 0; i < 20; i++) {
-      pos = random16(NUM_LEDS);
-      leds[pos] = CHSV(hue, 180, 255);
-    }
+void nightSparkles() {
+  fadeToBlackBy(leds, NUM_LEDS, 180);
+  numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
+  for (int i = 0; i < 20; i++) {
+    int pos = random16(NUM_LEDS);
+    leds[pos] = CHSV(hue, 180, 255);
   }
-
   for (int i = 0; i < numberOfSparkles * 4; i++) {
-    pos = random16(NUM_LEDS);
-    if (patternId == RAINBOW) {
-      leds[pos] += CHSV(hue, 200, 20);
-    } else if (patternId == RAINBOW_2) {
+    leds[random16(NUM_LEDS)] += CHSV(hue, 200, 20);
+  }
+  hue = hue + 1;
+}
+
+void sparkles() {
+  fadeToBlackBy(leds, NUM_LEDS, 200);
+  numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
+  for (int i = 0; i < numberOfSparkles * 4; i++) {
+    int pos = random16(NUM_LEDS);
+    if (patternId == BEAUTIFUL_SPARKLES) {
       leds[pos] = CHSV(hue + (pos / 10), 240, 255);
-    } else if (patternId == RAINBOW_3) {
+    } else if (patternId == SINGLE_COLOR_SPARKLES) {
       leds[pos] = CHSV(hue, 240, 255);
     }
   }
 
-  if (patternId == RAINBOW_2) {
+  if (patternId == BEAUTIFUL_SPARKLES) {
     hue += 10;
   } else {
     hue = hue + 1;
@@ -107,9 +107,9 @@ void juggle() {
   if (faderate == 100 || faderate == 200) {
     numdots += 1;
   }
-  
+
   fadeToBlackBy(leds, NUM_LEDS, faderate);
-  
+
   for ( int i = 0; i < numdots; i++) {
     for ( int j = 0; j < 20; j++) {
       leds[beatsin16(basebeat + i + numdots, 0, NUM_LEDS - 20) + j] += CHSV(curhue, 240, 255); //beat16 is a FastLED 3.1 function
@@ -134,7 +134,7 @@ void discoBarber() {
     allfreq = 3;
     thisphase += 48;
   }
-  
+
   hue = hue + 1;                                                // Hue rotation is fun for thiswave.
 
   for (int k = 0; k < NUM_LEDS - 1; k++) {                                    // For each of the LED's in the strand, set a brightness based on a wave as follows:
@@ -167,8 +167,10 @@ void loop () {
     }
   }
 
-  if (patternId == RAINBOW || patternId == RAINBOW_2 || patternId == RAINBOW_3) {
-    confetti();
+  if (patternId == NIGHT_SPARKLES) {
+    nightSparkles();
+  } else if (patternId == BEAUTIFUL_SPARKLES || patternId == SINGLE_COLOR_SPARKLES) {
+    sparkles();
   } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
     discoBarber();
   } else if (patternId == JUGGLE) {
