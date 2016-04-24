@@ -27,11 +27,11 @@ int maxPatternId = 8;
 int rotationInMillseconds = 20000; // 20 seconds for production
 
 // Either A)
-bool holdPattern = true;
-int patternId = DISCO_TWIRL;
+//bool holdPattern = true;
+//int patternId = DISCO_TWIRL;
 // OR B)
-//bool holdPattern = false;
-//int patternId = NIGHT_SPARKLES;
+bool holdPattern = false;
+int patternId = BEAUTIFUL_SPARKLES;
 
 void setup() {
   delay(3000);
@@ -201,20 +201,33 @@ bool thisdir = 0;                                             // You can change 
 int8_t thisspeed = 32;                                         // You can change the speed, and use negative values.
 uint8_t allfreq = 32;                                         // You can change the frequency, thus overall width of bars.
 int thisphase = 0;                                            // Phase change value gets calculated.
-uint8_t thiscutoff = 192;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
-int thisdelay = 20;                                           // You can change the delay. Also you can change the allspeed variable above. 
-uint8_t bgclr = 0;                                            // A rotating background colour.
-uint8_t bgbri = 16;                                           // Don't go below 16.
-// End of resetvar() redefinitions.
+uint8_t thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
 
 void discoTwirl() {
+
+  if (firstTimeRunningThroughPattern) {
+    allfreq = 32;
+    thiscutoff -= 240;
+  } else {
+    EVERY_N_MILLISECONDS(1000) {
+//      thiscutoff += 1;
+      allfreq += 1;
+      if (thiscutoff == 255) {
+        thiscutoff = 0;
+      }
+      if (allfreq == 255) {
+        allfreq = 0;
+      }
+    }
+  }
+  
   //  if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
   thisphase += thisspeed;
   thishue += thisrot;                                                         // Hue rotation is fun for thiswave.
   for (int k=0; k<NUM_LEDS-1; k++) {
     int thisbright = qsubd(cubicwave8((k*allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
-    leds[k] = CHSV(bgclr, 255, bgbri);
-    leds[k] += CHSV(thishue + k, allsat, thisbright);                               // Assigning hues and brightness to the led array.
+    leds[k] = CHSV(0, 255, 0);
+    leds[k] += CHSV(thishue + k + thisphase / 5, allsat, thisbright);                               // Assigning hues and brightness to the led array.
   }
 }
 
@@ -241,8 +254,8 @@ void loop () {
     worms();
   } else if (patternId == PARTY) {
     party();
-  } else if (patternId == SIREN) {
-    siren();
+//  } else if (patternId == SIREN) {
+//    siren();
   } else if (patternId == DISCO_TWIRL) {
     discoTwirl();
   }
