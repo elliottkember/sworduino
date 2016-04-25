@@ -1,8 +1,6 @@
-uint8_t wavebright = 255;                  // You can change the brightness of the waves/bars rolling across the screen.
-#define qsubd(x, b)  ((x>b)?wavebright:0)  // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
-#define qsuba(x, b)  ((x>b)?x-b:0)         // Analog Unsigned subtraction macro. if result <0, then => 0
-
 #include "FastLED.h"
+#define qsubd(x, b)  ((x>b)?255:0)  // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
+#define qsuba(x, b)  ((x>b)?x-b:0)         // Analog Unsigned subtraction macro. if result <0, then => 0
 #define LED_DT 7              // Data pin to connect to the strip.
 #define COLOR_ORDER GRB       // Are they RGB, GRB or what??
 #define LED_TYPE WS2812B      // Don't forget to change LEDS.addLeds
@@ -13,28 +11,27 @@ unsigned long previousMillis; // Store last time the strip was updated.
 int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = false;
 
-#define NIGHT_SPARKLES 1
-#define BEAUTIFUL_SPARKLES 2
-#define DISCO_BARBER_2 3
-#define DISCO_BARBER_1 4
-#define SINGLE_COLOR_SPARKLES 5
-#define WORMS 6
-#define PARTY 7
-//#define SIREN 8
-#define DISCO_TWIRL 8
+#define BEAUTIFUL_SPARKLES 1
+#define DISCO_BARBER_2 2
+#define DISCO_BARBER_1 3
+#define SINGLE_COLOR_SPARKLES 4
+#define WORMS 5
+#define PARTY 6
+#define DISCO_TWIRL 7
+#define NIGHT_SPARKLES 8
 
 int maxPatternId = 8;
 int rotationInMillseconds = 20000; // 20 seconds for production
 
 // Either A)
 //bool holdPattern = true;
-//int patternId = DISCO_TWIRL;
+//int patternId = BEAUTIFUL_SPARKLES;
 // OR B)
 bool holdPattern = false;
 int patternId = BEAUTIFUL_SPARKLES;
 
 void setup() {
-  delay(3000);
+  delay(1000);
   Serial.begin(57600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(max_bright);
@@ -182,18 +179,6 @@ void party() {
   }
 }
 
-uint8_t sirenHue = 0;                                          // Starting hue value.
-int8_t sirenRotation = 10;                                           // Hue rotation speed. Includes direction.
-uint8_t sirenDeltahue = 10;                                         // Hue change between pixels.
-bool sirenDirection = 0;                                             // I use a direction variable, so I can plug into inputs in a standar fashion.
-
-void siren() {
-  if (sirenDirection == 0) sirenHue += sirenRotation; else sirenHue -= sirenRotation; // I could use signed math, but 'thisdir' works with other routines. 
-  sirenDeltahue = 1; 
-  sirenRotation = 30;
-  fill_rainbow(leds, NUM_LEDS, sirenHue, sirenDeltahue);
-}
-
 uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
 uint8_t thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
 uint8_t allsat = 255;                                         // I like 'em fully saturated with colour.
@@ -210,11 +195,7 @@ void discoTwirl() {
     thiscutoff -= 240;
   } else {
     EVERY_N_MILLISECONDS(1000) {
-//      thiscutoff += 1;
       allfreq += 1;
-      if (thiscutoff == 255) {
-        thiscutoff = 0;
-      }
       if (allfreq == 255) {
         allfreq = 0;
       }
@@ -254,8 +235,6 @@ void loop () {
     worms();
   } else if (patternId == PARTY) {
     party();
-//  } else if (patternId == SIREN) {
-//    siren();
   } else if (patternId == DISCO_TWIRL) {
     discoTwirl();
   }
