@@ -65,7 +65,7 @@ void confetti() {
   int pos;
 
   if (patternId == RAINBOW) {
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < numberOfSparkles; i++) {
       pos = random16(NUM_LEDS);
       leds[pos] += CHSV(thishue, 255, 255);
     }
@@ -74,7 +74,7 @@ void confetti() {
   for (int i = 0; i < numberOfSparkles * 8; i++) {
     pos = random16(NUM_LEDS);
     if (patternId == RAINBOW) {
-      leds[pos] += CHSV(thishue, 255, 20);
+      leds[pos] += CHSV(thishue, 255, 30);
     } else if (patternId == RAINBOW_2) {
       leds[pos] = CHSV(thishue + (pos / 10), thissat, thisbri);
     } else if (patternId == RAINBOW_3) {
@@ -146,17 +146,17 @@ void discoBarber() {
   bgclr++;
 }
 
-void newPattern() {
-  int i = 0;
-  for (int k = 0; k < NUM_LEDS; k++) {
-    int colour = k; //  + i;
-    leds[k + i] = CHSV(colour, 255, 255);
-  }
-  i++;
-  if (i > NUM_LEDS) {
-    i = 0;
-  }
-}
+//void newPattern() {
+//  int i = 0;
+//  for (int k = 0; k < NUM_LEDS; k++) {
+//    int colour = k; //  + i;
+//    leds[k + i] = CHSV(colour, 255, 255);
+//  }
+//  i++;
+//  if (i > NUM_LEDS) {
+//    i = 0;
+//  }
+//}
 
 void loop () {
   if (!holdPattern) {
