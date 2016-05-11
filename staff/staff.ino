@@ -4,7 +4,7 @@
 #define LED_DT 7              // Data pin to connect to the strip.
 #define COLOR_ORDER GRB       // Are they RGB, GRB or what??
 #define LED_TYPE WS2812B      // Don't forget to change LEDS.addLeds
-#define NUM_LEDS 100         // Number of LED's.
+#define NUM_LEDS 1500         // Number of LED's.
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 uint8_t max_bright = 128;     // Overall brightness definition. It can be changed on the fly.
 unsigned long previousMillis; // Store last time the strip was updated.
@@ -13,29 +13,29 @@ bool firstTimeRunningThroughPattern = false;
 
 #define BEAUTIFUL_SPARKLES 1
 #define DISCO_BARBER_2 2
-#define DISCO_BARBER_1 3
-#define SINGLE_COLOR_SPARKLES 4
-#define WORMS 5
+#define SINGLE_COLOR_SPARKLES 3
+#define WORMS 4
+#define DISCO_BARBER_1 5
 #define PARTY 6
 #define DISCO_TWIRL 7
 #define NIGHT_SPARKLES 8
 
 int maxPatternId = 8;
-int rotationInMillseconds = 2000; // 20 seconds for production
+int rotationInMillseconds = 20000; // 20 seconds for production
 
 // Either A)
-bool holdPattern = true;
-int patternId = DISCO_TWIRL;
+//bool holdPattern = true;
+//int patternId = PARTY;
 // OR B)
-//bool holdPattern = false;
-//int patternId = BEAUTIFUL_SPARKLES;
+bool holdPattern = false;
+int patternId = BEAUTIFUL_SPARKLES;
 
 void setup() {
-  delay(1000);
+  delay(50);
   Serial.begin(57600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(max_bright);
-  set_max_power_in_volts_and_milliamps(5, 3000);
+  set_max_power_in_volts_and_milliamps(5, 10000);
   randomSeed(analogRead(0));
 }
 
@@ -63,9 +63,9 @@ void nightSparkles() {
     leds[pos] = CHSV(hue, 180, 255);
   }
   for (int i = 0; i < numberOfSparkles * 4; i++) {
-    leds[random16(NUM_LEDS)] += CHSV(hue, 200, 20);
+    leds[random16(NUM_LEDS)] = CHSV(hue, 200, 20);
   }
-  hue = hue + 1;
+  hue += 24;
 }
 
 void beautifulSparkles() {
@@ -144,7 +144,7 @@ int partySeed;
 int partySeedDirection = true;
 
 void party() {
-  int partySeedLength = 200;
+  int partySeedLength = 800;
   if (firstTimeRunningThroughPattern) {
     partySeed = 0;
   } else {
@@ -158,7 +158,7 @@ void party() {
   EVERY_N_MILLISECONDS(500) {
     hue += 33;
   }
-  fadeToBlackBy(leds, NUM_LEDS, 120);
+  fadeToBlackBy(leds, NUM_LEDS, 80);
   int brightness = 255;
   int saturation = 200;
   int pos = random(partySeed - partySeedLength, partySeed + partySeedLength);
@@ -182,8 +182,8 @@ void party() {
 uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
 uint8_t thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
 uint8_t allsat = 255;                                         // I like 'em fully saturated with colour.
-bool thisdir = 0;                                             // You can change direction.
-int8_t thisspeed = 32;                                         // You can change the speed, and use negative values.
+bool thisdir = 1;                                             // You can change direction.
+int8_t thisspeed = 48;                                         // You can change the speed, and use negative values.
 uint8_t allfreq = 32;                                         // You can change the frequency, thus overall width of bars.
 int thisphase = 0;                                            // Phase change value gets calculated.
 uint8_t thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
@@ -191,8 +191,15 @@ uint8_t thiscutoff = 200;                                     // You can change 
 void discoTwirl() {
 
   if (firstTimeRunningThroughPattern) {
-    allfreq = 32;
-    thiscutoff -= 240;
+    thishue = 0;                                          // You can change the starting hue value for the first wave.
+    thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
+    allsat = 255;                                         // I like 'em fully saturated with colour.
+    thisdir = 1;                                             // You can change direction.
+    thisspeed = 48;                                         // You can change the speed, and use negative values.
+    allfreq = 32;                                         // You can change the frequency, thus overall width of bars.
+    thisphase = 0;                                            // Phase change value gets calculated.
+    thiscutoff = 200;    
+    
   } else {
     EVERY_N_MILLISECONDS(1000) {
 //      allfreq += 1;
@@ -202,8 +209,8 @@ void discoTwirl() {
     }
   }
   
-  //  if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
-  thisphase += thisspeed;
+  if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
+//  thisphase += thisspeed;
 //  thishue += thisrot;                                                         // Hue rotation is fun for thiswave.
   for (int k=0; k<NUM_LEDS-1; k++) {
     int thisbright = qsubd(cubicwave8((k*allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
@@ -238,8 +245,6 @@ void loop () {
   } else if (patternId == DISCO_TWIRL) {
     discoTwirl();
   }
-
-  delay(30);
 
   firstTimeRunningThroughPattern = false;
 
