@@ -9,22 +9,22 @@ struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 uint8_t max_bright = 128;     // Overall brightness definition. It can be changed on the fly.
 unsigned long previousMillis; // Store last time the strip was updated.
 int hue = 50;                 // Starting hue.
-bool firstTimeRunningThroughPattern = false;
+bool firstTimeRunningThroughPattern = true;
 
 #define BEAUTIFUL_SPARKLES 1
 #define DISCO_BARBER_2 2
 #define SINGLE_COLOR_SPARKLES 3
 #define WORMS 4
 #define DISCO_BARBER_1 5
-#define PARTY 6
-#define DISCO_TWIRL 7
-#define NIGHT_SPARKLES 8
+//#define PARTY 6
+#define DISCO_TWIRL 6
+#define NIGHT_SPARKLES 7
 
 int maxPatternId = 7;
 int rotationInMillseconds = 20000; // 20 seconds for production¡
 
 //bool holdPattern = true;
-//int patternId = PARTY;
+//int patternId = NIGHT_SPARKLES;
 bool holdPattern = false;
 int patternId = BEAUTIFUL_SPARKLES;
 
@@ -86,19 +86,22 @@ void sparkles() {
   hue += 1;
 }
 
-uint8_t numberOfWorms = 3;
-uint8_t wormsFadeRate = 64; // Very low value = longer trails.
-uint8_t wormsHueIncrement = 1; // Incremental change in hue between each dot.
-uint8_t wormsStartingHue = 0; // The current hue
-uint8_t wormsBaseBeat = 2; // Higher = faster movement.
+uint8_t numberOfWorms = 4;
+uint8_t wormsFadeRate = 80; // Very low value = longer trails.
+uint8_t wormsHueIncrement = 2; // Incremental change in hue between each dot.
+uint8_t wormsStartingHue = 180; // The current hue
+uint8_t wormsBaseBeat = 10; // Higher = faster movement.
 
 void worms() {
   fadeToBlackBy(leds, NUM_LEDS, wormsFadeRate);
   for ( int i = 0; i < numberOfWorms; i++) {
-    for ( int j = 0; j < 20; j++) {
-      leds[beatsin16(wormsBaseBeat + i + numberOfWorms, 0, NUM_LEDS - 20) + j] += CHSV(wormsStartingHue, 240, 255);
+    for ( int j = 0; j < 80; j++) {
+      leds[beatsin16(wormsBaseBeat + i + numberOfWorms, 0, NUM_LEDS - 80) + j] += CHSV(wormsStartingHue, 180, 255);
     }
     wormsStartingHue += wormsHueIncrement;
+    if (wormsStartingHue > 270) {
+      wormsStartingHue = 180;
+    }
   }
 }
 
@@ -138,54 +141,54 @@ void discoBarber() {
   }
 }
 
-int partySeed;
-int partySeedDirection = true;
-
-void party() {
-  int partySeedLength = 1500;
-  if (firstTimeRunningThroughPattern) {
-    partySeed = 0;
-  } else {
-    partySeed += partySeedDirection ? 20 : -20;
-    if (partySeed > NUM_LEDS - partySeedLength) {
-      partySeedDirection = false;
-    } else if (partySeed < 0) {
-      partySeedDirection = true;
-    }
-  }
-  EVERY_N_MILLISECONDS(100) {
-    hue += 5;
-  }
-  fadeToBlackBy(leds, NUM_LEDS, 80);
-  int brightness = 255;
-  int saturation = 200;
-  int pos;
-
-  for (int i = 0; i < 3; i++) {
-    pos = random(partySeed - partySeedLength, partySeed + partySeedLength);
-    for (int i = pos; i <= pos + 50; i++) {
-      brightness *= 0.97;
-      if (i < NUM_LEDS && i > 0) {
-        leds[i] = CHSV(hue, saturation, brightness);
-      }
-    }
-    brightness = 255;
-    saturation = 255;
-    for (int j = pos; j >= pos - 50; j--) {
-      brightness *= 0.97;
-      if (j < NUM_LEDS && j > 0) {
-        leds[j] = CHSV(hue, saturation, brightness);
-      }
-    }
-  }
-}
+//int partySeed;
+//int partySeedDirection = true;
+//
+//void party() {
+//  int partySeedLength = 1500;
+//  if (firstTimeRunningThroughPattern) {
+//    partySeed = 0;
+//  } else {
+//    partySeed += partySeedDirection ? 20 : -20;
+//    if (partySeed > NUM_LEDS - partySeedLength) {
+//      partySeedDirection = false;
+//    } else if (partySeed < 0) {
+//      partySeedDirection = true;
+//    }
+//  }
+//  EVERY_N_MILLISECONDS(100) {
+//    hue += 5;
+//  }
+//  fadeToBlackBy(leds, NUM_LEDS, 80);
+//  int brightness = 255;
+//  int saturation = 200;
+//  int pos;
+//
+//  for (int i = 0; i < 3; i++) {
+//    pos = random(partySeed - partySeedLength, partySeed + partySeedLength);
+//    for (int i = pos; i <= pos + 50; i++) {
+//      brightness *= 0.97;
+//      if (i < NUM_LEDS && i > 0) {
+//        leds[i] = CHSV(hue, saturation, brightness);
+//      }
+//    }
+//    brightness = 255;
+//    saturation = 255;
+//    for (int j = pos; j >= pos - 50; j--) {
+//      brightness *= 0.97;
+//      if (j < NUM_LEDS && j > 0) {
+//        leds[j] = CHSV(hue, saturation, brightness);
+//      }
+//    }
+//  }
+//}
 
 uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
 uint8_t thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
 uint8_t allsat = 255;                                         // I like 'em fully saturated with colour.
-bool thisdir = 1;                                             // You can change direction.
+bool thisdir = 0;                                             // You can change direction.
 int8_t thisspeed = 16;                                         // You can change the speed, and use negative values.
-uint8_t allfreq = 32;                                         // You can change the frequency, thus overall width of bars.
+uint8_t allfreq = 1;                                         // You can change the frequency, thus overall width of bars.
 int thisphase = 0;                                            // Phase change value gets calculated.
 uint8_t thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
 uint8_t fade = 200;
@@ -195,42 +198,27 @@ void discoTwirl() {
 
   if (firstTimeRunningThroughPattern) {
     thishue = 0;                                          // You can change the starting hue value for the first wave.
-    thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
-    allsat = 255;                                         // I like 'em fully saturated with colour.
-    thisdir = 1;                                             // You can change direction.
-    thisspeed = 48;                                         // You can change the speed, and use negative values.
-    allfreq = 32;                                         // You can change the frequency, thus overall width of bars.
+    thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
+    allsat = 180;                                         // I like 'em fully saturated with colour.
+    thisdir = 0;                                             // You can change direction.
+    thisspeed = 8;                                         // You can change the speed, and use negative values.
+    allfreq = 4;                                         // You can change the frequency, thus overall width of bars.
     thisphase = 0;                                            // Phase change value gets calculated.
-    thiscutoff = 200;
-
+    thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+    fade = 200;
+    fadeUp = 0;
   } else {
-    EVERY_N_MILLISECONDS(5) {
-      if (fadeUp) {
-        fade += 10;
-      } else {
-        fade -= 10;
-      }
-
-      if (fade < 50) {
-        fadeUp = 1;
-      } else if (fade > 140) {
-        fadeUp = 0;
-      }
-//      allfreq += 1;
-//      if (allfreq == 255) {
-//        allfreq = 0;
-//      }
+    EVERY_N_MILLISECONDS(2) {
+      if (fadeUp) fade += 10; else fade -= 10;
+      if (fade < 50) fadeUp = 1; else if (fade > 250) fadeUp = 0;
     }
   }
 
   if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
-//  thisphase += thisspeed;
-//  thishue += thisrot;                                                         // Hue rotation is fun for thiswave.
-fadeToBlackBy(leds, NUM_LEDS, fade);
+  fadeToBlackBy(leds, NUM_LEDS, fade);
   for (int k=0; k<NUM_LEDS-1; k++) {
-    int thisbright = qsubd(cubicwave8((k*-allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
-//    leds[k] = CHSV(0, 255, 0);
-    leds[k] += CHSV(thishue + k + thisphase / 5, allsat, thisbright);                               // Assigning hues and brightness to the led array.
+    int thisbright = cubicwave8((k*-allfreq)+thisphase);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    leds[k] += CHSV(thishue + k + thisphase / 5, 200, thisbright);                               // Assigning hues and brightness to the led array.
   }
 }
 
@@ -255,8 +243,8 @@ void loop () {
     discoBarber();
   } else if (patternId == WORMS) {
     worms();
-  } else if (patternId == PARTY) {
-    party();
+//  } else if (patternId == PARTY) {
+//    party();
   } else if (patternId == DISCO_TWIRL) {
     discoTwirl();
   }
