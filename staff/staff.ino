@@ -18,15 +18,16 @@ bool firstTimeRunningThroughPattern = true;
 #define DISCO_BARBER_1 5
 //#define PARTY 6
 #define DISCO_TWIRL 6
-#define NIGHT_SPARKLES 7
+#define DISCO_TWIRL_2 7
+#define NIGHT_SPARKLES 8
 
-int maxPatternId = 7;
-int rotationInMillseconds = 20000; // 20 seconds for production¡
+int maxPatternId = 8;
+int rotationInMillseconds = 29000; // 20 seconds for production¡
 
 //bool holdPattern = true;
-//int patternId = NIGHT_SPARKLES;
-bool holdPattern = false;
-int patternId = BEAUTIFUL_SPARKLES;
+//int patternId = DISCO_TWIRL_2;
+ bool holdPattern = false;
+ int patternId = BEAUTIFUL_SPARKLES;
 
 void setup() {
   delay(50);
@@ -222,6 +223,26 @@ void discoTwirl() {
   }
 }
 
+void discoTwirl2() {
+
+  if (firstTimeRunningThroughPattern) {
+    thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
+    allsat = 255;                                         // I like 'em fully saturated with colour.
+    thisdir = 0;                                             // You can change direction.
+    thisspeed = 32;                                         // You can change the speed, and use negative values.
+    allfreq = 32;                                         // You can change the frequency, thus overall width of bars.
+    thisphase = 0;                                            // Phase change value gets calculated.
+    thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+  }
+
+  if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
+  fadeToBlackBy(leds, NUM_LEDS, fade);
+  for (int k=0; k<NUM_LEDS-1; k++) {
+    int thisbright = qsubd(cubicwave8((k*-allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    leds[k] += CHSV(thishue + k + thisphase / 5, allsat, thisbright);                               // Assigning hues and brightness to the led array.  }
+  }
+}
+
 void loop () {
   if (!holdPattern) {
     EVERY_N_MILLISECONDS(rotationInMillseconds) {
@@ -247,7 +268,10 @@ void loop () {
 //    party();
   } else if (patternId == DISCO_TWIRL) {
     discoTwirl();
+  } else if (patternId == DISCO_TWIRL_2) {
+    discoTwirl2();
   }
+
 
   firstTimeRunningThroughPattern = false;
 
