@@ -22,7 +22,7 @@ bool firstTimeRunningThroughPattern = true;
 #define NIGHT_SPARKLES 8
 
 int maxPatternId = 8;
-int rotationInMillseconds = 29000; // 20 seconds for production¡
+int rotationInMillseconds = 20000; // 20 seconds for production¡
 
 //bool holdPattern = true;
 //int patternId = DISCO_TWIRL_2;
@@ -226,6 +226,18 @@ void discoTwirl() {
 void discoTwirl2() {
 
   if (firstTimeRunningThroughPattern) {
+     thishue = 0;                                          // You can change the starting hue value for the first wave.
+thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
+allsat = 255;                                         // I like 'em fully saturated with colour.
+thisdir = 0;                                             // You can change direction.
+thisspeed = 16;                                         // You can change the speed, and use negative values.
+allfreq = 1;                                         // You can change the frequency, thus overall width of bars.
+thisphase = 0;                                            // Phase change value gets calculated.
+thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+fade = 200;
+fadeUp = 0;
+
+
     thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
     allsat = 255;                                         // I like 'em fully saturated with colour.
     thisdir = 0;                                             // You can change direction.
