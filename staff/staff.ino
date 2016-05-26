@@ -22,13 +22,13 @@ bool firstTimeRunningThroughPattern = true;
 #define NIGHT_SPARKLES 8
 #define DAVE 9
 
-int maxPatternId = 8;
+int maxPatternId = 9;
 int rotationInMillseconds = 20000; // 20 seconds for production¡
 
-//bool holdPattern = true;
-//int patternId = DISCO_TWIRL_2;
- bool holdPattern = true;
- int patternId = DAVE;
+bool holdPattern = false;
+int patternId = BEAUTIFUL_SPARKLES;
+// bool holdPattern = true;
+// int patternId = DAVE;
 
 void setup() {
   delay(50);
