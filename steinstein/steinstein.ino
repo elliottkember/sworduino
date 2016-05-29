@@ -7,10 +7,10 @@
 #define DISTANCE_BETWEEN_LOOPS 200
 #define MAX_EFFECTIVE_DISTANCE_SQUARED 300 * 300
 #define NUM_LEDS 1500
-#define MAX_DELTA 16
+#define MAX_DELTA 14
 #define MAX_BRIGHTNESS 48
 #define MIN_BRIGHTNESS 2
-#define MAX_DROPS 6
+#define MAX_DROPS 60
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 struct CRGB stein_next[NUM_LEDS]; 
 
@@ -33,13 +33,13 @@ int GAIN_NUM [3] = {10, 10, 10};
 
 void loop() {
   counter++;
-  if (counter % 5 == 0){
-    int hue_target = random(270);
-    for (int rgb_idx = 0; rgb_idx < 3; rgb_idx++)
-       GAIN_NUM[rgb_idx] = 8 + ((hue_target + 90 * rgb_idx) % 270) / 58;
-//    int gain_seed = random(6);
+  if (counter % (GAIN_NUM[0]/3) == 0){
+//    int hue_target = random(270);
 //    for (int rgb_idx = 0; rgb_idx < 3; rgb_idx++)
-//       GAIN_NUM[rgb_idx] = 8 + gain_seed;
+//       GAIN_NUM[rgb_idx] = 8 + ((hue_target + 90 * rgb_idx) % 270) / 58;
+    int gain_seed = random(7);
+    for (int rgb_idx = 0; rgb_idx < 3; rgb_idx++)
+       GAIN_NUM[rgb_idx] = 17 + gain_seed;
   }
   for (int i = 0; i < NUM_LEDS; i++) {
     stein_next[i] = CRGB(leds[i].red, leds[i].g, leds[i].b);
@@ -59,12 +59,14 @@ void loop() {
         // this pixel changes my next value
         int pixel_m_color [3] = { leds[pixel_m].r, leds[pixel_m].g, leds[pixel_m].b };
         for (int rgb_idx = 0; rgb_idx < 3; rgb_idx++){
-          pixel_ks_next_step[rgb_idx] = GAIN_NUM[rgb_idx] * (pixel_ks_weight * pixel_ks_next_step[rgb_idx] + distance_squared * pixel_m_color[rgb_idx]) / (10 * (pixel_ks_weight + distance_squared));
+          pixel_ks_next_step[rgb_idx] = GAIN_NUM[rgb_idx] * (pixel_ks_weight * pixel_ks_next_step[rgb_idx] + distance_squared * pixel_m_color[rgb_idx]) / (20 * (pixel_ks_weight + distance_squared));
         }
         pixel_ks_weight += distance_squared;
       }
     }
     for (int rgb_idx = 0; rgb_idx < 3; rgb_idx++){
+      if (pixel_ks_next_step[rgb_idx] < pixel_ks_last_step[rgb_idx])
+        pixel_ks_next_step[rgb_idx] /= 2;
       if (pixel_ks_last_step[rgb_idx] - pixel_ks_next_step[rgb_idx] > MAX_DELTA){
         stein_next[pixel_k][rgb_idx] = pixel_ks_last_step[rgb_idx] - MAX_DELTA;
       } else if (pixel_ks_last_step[rgb_idx] - pixel_ks_next_step[rgb_idx] < 0-MAX_DELTA) {
@@ -81,13 +83,14 @@ void loop() {
   }
   for (int i = 0; i<random(MAX_DROPS); i++){
     int k = random(NUM_LEDS);
+    CRGB color = CRGB(random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS));
     if (k > DOTS_PER_LOOP + 1)
-      leds[k-DOTS_PER_LOOP-1] = CRGB(random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS));
+      leds[k-DOTS_PER_LOOP-1] = color;
     if (k > DOTS_PER_LOOP)
-      leds[k-DOTS_PER_LOOP] = CRGB(random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS));
+      leds[k-DOTS_PER_LOOP] = color;
     if (k > 1)
-      leds[k-1] = CRGB(random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS));
-    leds[k] = CRGB(random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS), random(MAX_BRIGHTNESS));
+      leds[k-1] = color;
+    leds[k] = color;
   }
   
   show_at_max_brightness_for_power();
