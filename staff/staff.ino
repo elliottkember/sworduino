@@ -6,29 +6,28 @@
 #define LED_TYPE WS2812B      // Don't forget to change LEDS.addLeds
 #define NUM_LEDS 1500         // Number of LED's.
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
-uint8_t max_bright = 128;     // Overall brightness definition. It can be changed on the fly.
+uint8_t max_bright = 255;     // Overall brightness definition. It can be changed on the fly.
 unsigned long previousMillis; // Store last time the strip was updated.
 int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
 
 #define BEAUTIFUL_SPARKLES 1
-#define DISCO_BARBER_2 2
+#define NIGHT_SPARKLES 2
 #define SINGLE_COLOR_SPARKLES 3
-#define WORMS 4
-#define DISCO_BARBER_1 5
-//#define PARTY 6
-#define DISCO_TWIRL 6
-#define DISCO_TWIRL_2 7
-#define NIGHT_SPARKLES 8
-#define DAVE 9
+#define DAVE 4
+#define WORMS 5
+#define DISCO_BARBER_1 6
+#define DISCO_TWIRL 7
+#define DISCO_BARBER_2 8
+#define DISCO_TWIRL_2 9
 
 int maxPatternId = 9;
-int rotationInMillseconds = 20000; // 20 seconds for production¡
+int rotationInMillseconds = 20000; // 20 seconds for production
 
 bool holdPattern = false;
 int patternId = BEAUTIFUL_SPARKLES;
 // bool holdPattern = true;
-// int patternId = DAVE;
+// int patternId = DISCO_TWIRL;
 
 void setup() {
   delay(50);
@@ -113,16 +112,20 @@ int upAndDownBy(int value, int difference) {
 }
 
 void nightSparkles() {
+  if (firstTimeRunningThroughPattern) {
+    hue = 32;
+    numberOfSparkles = 40;
+  }
   fadeToBlackBy(leds, NUM_LEDS, 180);
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < numberOfSparkles * 2; i++) {
     int pos = random16(NUM_LEDS);
     leds[pos] = CHSV(hue, 180, 255);
   }
-  for (int i = 0; i < numberOfSparkles * 4; i++) {
+  for (int i = 0; i < numberOfSparkles * 8; i++) {
     leds[random16(NUM_LEDS)] = CHSV(hue, 200, 20);
   }
-  hue += 24;
+  hue += 1;
 }
 
 void beautifulSparkles() {
@@ -266,6 +269,7 @@ void discoTwirl() {
     thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
     fade = 200;
     fadeUp = 0;
+    fadeToBlackBy(leds, NUM_LEDS, 255);
   } else {
     EVERY_N_MILLISECONDS(2) {
       if (fadeUp) fade += 10; else fade -= 10;
@@ -284,18 +288,16 @@ void discoTwirl() {
 void discoTwirl2() {
 
   if (firstTimeRunningThroughPattern) {
-     thishue = 0;                                          // You can change the starting hue value for the first wave.
-thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
-allsat = 255;                                         // I like 'em fully saturated with colour.
-thisdir = 0;                                             // You can change direction.
-thisspeed = 16;                                         // You can change the speed, and use negative values.
-allfreq = 1;                                         // You can change the frequency, thus overall width of bars.
-thisphase = 0;                                            // Phase change value gets calculated.
-thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
-fade = 200;
-fadeUp = 0;
-
-
+    thishue = 0;                                          // You can change the starting hue value for the first wave.
+    thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
+    allsat = 255;                                         // I like 'em fully saturated with colour.u¨
+    thisdir = 0;                                             // You can change direction.
+    thisspeed = 16;                                         // You can change the speed, and use negative values.
+    allfreq = 1;                                         // You can change the frequency, thus overall width of bars.
+    thisphase = 0;                                            // Phase change value gets calculated.
+    thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+    fade = 200;
+    fadeUp = 0;
     thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
     allsat = 255;                                         // I like 'em fully saturated with colour.
     thisdir = 0;                                             // You can change direction.
