@@ -268,7 +268,7 @@ void discoTwirl() {
     thisphase = 0;                                            // Phase change value gets calculated.
     thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
     fade = 200;
-    fadeUp = 0;
+    fadeUp = 1;
     fadeToBlackBy(leds, NUM_LEDS, 255);
   } else {
     EVERY_N_MILLISECONDS(2) {
