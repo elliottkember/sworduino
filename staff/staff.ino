@@ -4,7 +4,7 @@
 #define LED_DT 7              // Data pin to connect to the strip.
 #define COLOR_ORDER GRB       // Are they RGB, GRB or what??
 #define LED_TYPE WS2812B      // Don't forget to change LEDS.addLeds
-#define NUM_LEDS 1500         // Number of LED's.
+#define NUM_LEDS 300         // Number of LED's.
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 uint8_t max_bright = 255;     // Overall brightness definition. It can be changed on the fly.
 unsigned long previousMillis; // Store last time the strip was updated.
@@ -22,12 +22,12 @@ bool firstTimeRunningThroughPattern = true;
 #define DISCO_TWIRL_2 9
 
 int maxPatternId = 9;
-int rotationInMillseconds = 20000; // 20 seconds for production
+int rotationInMillseconds = 2000; // 20 seconds for production
 
-bool holdPattern = false;
-int patternId = BEAUTIFUL_SPARKLES;
-// bool holdPattern = true;
-// int patternId = DISCO_TWIRL;
+//bool holdPattern = false;
+//int patternId = BEAUTIFUL_SPARKLES;
+ bool holdPattern = true;
+ int patternId = DISCO_TWIRL;
 
 void setup() {
   delay(50);
@@ -99,9 +99,9 @@ int numberOfSparkles = 1;
 bool increasing = true;
 
 int upAndDownBy(int value, int difference) {
-  if (value < 80 && increasing) {
+  if (value < 20 && increasing) {
     value += difference;
-  } else if (value > 5) {
+  } else if (value > 1) {
     value -= difference;
     increasing = false;
   } else {
@@ -113,29 +113,31 @@ int upAndDownBy(int value, int difference) {
 
 void nightSparkles() {
   if (firstTimeRunningThroughPattern) {
-    hue = 32;
-    numberOfSparkles = 40;
+    hue = 200;
+//    numberOfSparkles = 10;
   }
   fadeToBlackBy(leds, NUM_LEDS, 180);
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
-  for (int i = 0; i < numberOfSparkles * 2; i++) {
+  for (int i = 0; i < numberOfSparkles; i++) {
     int pos = random16(NUM_LEDS);
     leds[pos] = CHSV(hue, 180, 255);
   }
-  for (int i = 0; i < numberOfSparkles * 8; i++) {
+  for (int i = 0; i < numberOfSparkles; i++) {
     leds[random16(NUM_LEDS)] = CHSV(hue, 200, 20);
   }
   hue += 1;
+  delay(6);
 }
 
 void beautifulSparkles() {
   fadeToBlackBy(leds, NUM_LEDS, 200);
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
-  for (int i = 0; i < numberOfSparkles * 4; i++) {
+  for (int i = 0; i < numberOfSparkles * 3; i++) {
     int pos = random16(NUM_LEDS);
-    leds[pos] = CHSV(hue + (pos / 10), 240, 255);
+    leds[pos] = CHSV(hue + (pos), 240, 255);
   }
   hue += 10;
+  delay(10);
 }
 
 void sparkles() {
@@ -157,8 +159,8 @@ uint8_t wormsBaseBeat = 10; // Higher = faster movement.
 void worms() {
   fadeToBlackBy(leds, NUM_LEDS, wormsFadeRate);
   for ( int i = 0; i < numberOfWorms; i++) {
-    for ( int j = 0; j < 80; j++) {
-      leds[beatsin16(wormsBaseBeat + i + numberOfWorms, 0, NUM_LEDS - 80) + j] += CHSV(wormsStartingHue, 180, 255);
+    for ( int j = 0; j < 20; j++) {
+      leds[beatsin16(wormsBaseBeat + i + numberOfWorms, 0, NUM_LEDS - 20) + j] += CHSV(wormsStartingHue, 180, 255);
     }
     wormsStartingHue += wormsHueIncrement;
     if (wormsStartingHue > 270) {
@@ -177,8 +179,8 @@ void discoBarber() {
     discoBarberFrequency = 5;
     discoBarberPhase += 24;
   } else {
-    discoBarberFrequency = 3;
-    discoBarberPhase += 48;
+    discoBarberFrequency = 4;
+    discoBarberPhase += 10;
   }
 
   hue = hue + 1;
@@ -189,7 +191,7 @@ void discoBarber() {
     leds[k] = CHSV(0, 0, 0);                                        // First set a background colour, but fully saturated.
 
     // Sparkles!
-    if (random(1000) > 996) {
+    if (random(1000) > 990) {
       leds[k] = CHSV(255, 0, 255);
     }
 
@@ -198,7 +200,7 @@ void discoBarber() {
       // leds[k] += CHSV(hue+k/5, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
       leds[k] += CHSV(hue * 10 + k / 2, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
     } else {
-      leds[k] += CHSV(hue * -20 + k / 4, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
+      leds[k] += CHSV(hue * -20 + k / 2, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
     }
   }
 }
@@ -268,7 +270,7 @@ void discoTwirl() {
     thisphase = 0;                                            // Phase change value gets calculated.
     thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
     fade = 200;
-    fadeUp = 0;
+    fadeUp = 1;
     fadeToBlackBy(leds, NUM_LEDS, 255);
   } else {
     EVERY_N_MILLISECONDS(2) {
@@ -310,7 +312,7 @@ void discoTwirl2() {
   if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
   fadeToBlackBy(leds, NUM_LEDS, fade);
   for (int k=0; k<NUM_LEDS-1; k++) {
-    int thisbright = qsubd(cubicwave8((k*-allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    int thisbright = cubicwave8((k*-allfreq)+thisphase);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
     leds[k] += CHSV(thishue + k + thisphase / 5, allsat, thisbright);                               // Assigning hues and brightness to the led array.  }
   }
 }
@@ -350,4 +352,5 @@ void loop () {
   firstTimeRunningThroughPattern = false;
 
   show_at_max_brightness_for_power();
+  delay(1000/30);
 }
