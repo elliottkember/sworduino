@@ -13,21 +13,21 @@ bool firstTimeRunningThroughPattern = true;
 
 #define BEAUTIFUL_SPARKLES 1
 #define NIGHT_SPARKLES 2
-#define SINGLE_COLOR_SPARKLES 3
-#define DAVE 4
-#define WORMS 5
-#define DISCO_BARBER_1 6
-#define DISCO_TWIRL 7
-#define DISCO_BARBER_2 8
-#define DISCO_TWIRL_2 9
+// #define SINGLE_COLOR_SPARKLES 3
+#define DAVE 3
+#define WORMS 4
+#define DISCO_BARBER_1 5
+#define DISCO_TWIRL 6
+#define DISCO_BARBER_2 7
+#define DISCO_TWIRL_2 8
 
-int maxPatternId = 9;
-int rotationInMillseconds = 2000; // 20 seconds for production
+int maxPatternId = 8;
+int rotationInMillseconds = 4000; // 20 seconds for production
 
-//bool holdPattern = false;
-//int patternId = BEAUTIFUL_SPARKLES;
- bool holdPattern = true;
- int patternId = DISCO_TWIRL;
+bool holdPattern = false;
+int patternId = BEAUTIFUL_SPARKLES;
+ // bool holdPattern = true;
+ // int patternId = DISCO_TWIRL;
 
 void setup() {
   delay(50);
@@ -53,7 +53,7 @@ void dave() {
     if(saturation == 0){
       value = 255;
     }
-    
+
     leds[k] = CHSV(hue, saturation, value);
 
 //    int thisbright = qsubd(cubicwave8((k*-allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
@@ -76,7 +76,7 @@ void dave() {
   }
 
 
-  
+
 
 //  int daveDelay;
 //  EVERY_N_MILLISECONDS(1){
@@ -134,21 +134,21 @@ void beautifulSparkles() {
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
   for (int i = 0; i < numberOfSparkles * 3; i++) {
     int pos = random16(NUM_LEDS);
-    leds[pos] = CHSV(hue + (pos), 240, 255);
+    leds[pos] = CHSV(hue + (pos / 7), 240, 255);
   }
   hue += 10;
   delay(10);
 }
 
-void sparkles() {
-  fadeToBlackBy(leds, NUM_LEDS, 200);
-  numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
-  for (int i = 0; i < numberOfSparkles * 4; i++) {
-    int pos = random16(NUM_LEDS);
-    leds[pos] = CHSV(hue, 240, 255);
-  }
-  hue += 1;
-}
+// void sparkles() {
+//   fadeToBlackBy(leds, NUM_LEDS, 200);
+//   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
+//   for (int i = 0; i < numberOfSparkles * 4; i++) {
+//     int pos = random16(NUM_LEDS);
+//     leds[pos] = CHSV(hue, 240, 255);
+//   }
+//   hue += 1;
+// }
 
 uint8_t numberOfWorms = 4;
 uint8_t wormsFadeRate = 80; // Very low value = longer trails.
@@ -274,8 +274,8 @@ void discoTwirl() {
     fadeToBlackBy(leds, NUM_LEDS, 255);
   } else {
     EVERY_N_MILLISECONDS(2) {
-      if (fadeUp) fade += 10; else fade -= 10;
-      if (fade < 50) fadeUp = 1; else if (fade > 250) fadeUp = 0;
+      if (fadeUp == 1) fade += 10; else fade -= 10;
+      if (fade < 50) fadeUp = 1; else if (fade > 245) fadeUp = 0;
     }
   }
 
@@ -332,8 +332,8 @@ void loop () {
     nightSparkles();
   } else if (patternId == BEAUTIFUL_SPARKLES) {
     beautifulSparkles();
-  } else if (patternId == SINGLE_COLOR_SPARKLES) {
-    sparkles();
+  // } else if (patternId == SINGLE_COLOR_SPARKLES) {
+  //   sparkles();
   } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
     discoBarber();
   } else if (patternId == WORMS) {
