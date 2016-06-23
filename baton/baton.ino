@@ -22,7 +22,7 @@ bool firstTimeRunningThroughPattern = true;
 #define DISCO_TWIRL_2 8
 
 int maxPatternId = 8;
-int rotationInMillseconds = 4000; // 20 seconds for production
+int rotationInMillseconds = 8000; // 20 seconds for production
 
 bool holdPattern = false;
 int patternId = BEAUTIFUL_SPARKLES;
