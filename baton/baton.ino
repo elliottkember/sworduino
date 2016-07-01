@@ -12,9 +12,9 @@ int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
 
 #define BEAUTIFUL_SPARKLES 1
-#define NIGHT_SPARKLES 2
+#define NIGHT_SPARKLES 3
 // #define SINGLE_COLOR_SPARKLES 3
-#define DAVE 3
+#define DAVE 2
 #define WORMS 4
 #define DISCO_BARBER_1 5
 #define DISCO_TWIRL 6
@@ -112,13 +112,13 @@ int upAndDownBy(int value, int difference) {
 }
 
 void nightSparkles() {
-  if (firstTimeRunningThroughPattern) {
-    hue = 200;
+//  if (firstTimeRunningThroughPattern) {
+//    hue = 200;
 //    numberOfSparkles = 10;
-  }
+//  }
   fadeToBlackBy(leds, NUM_LEDS, 180);
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
-  for (int i = 0; i < numberOfSparkles; i++) {
+  for (int i = 0; i < numberOfSparkles * 4; i++) {
     int pos = random16(NUM_LEDS);
     leds[pos] = CHSV(hue, 180, 255);
   }
@@ -130,7 +130,7 @@ void nightSparkles() {
 }
 
 void beautifulSparkles() {
-  fadeToBlackBy(leds, NUM_LEDS, 200);
+  fadeToBlackBy(leds, NUM_LEDS, 150);
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
   for (int i = 0; i < numberOfSparkles * 3; i++) {
     int pos = random16(NUM_LEDS);
@@ -303,8 +303,8 @@ void discoTwirl2() {
     thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
     allsat = 255;                                         // I like 'em fully saturated with colour.
     thisdir = 0;                                             // You can change direction.
-    thisspeed = 32;                                         // You can change the speed, and use negative values.
-    allfreq = 32;                                         // You can change the frequency, thus overall width of bars.
+    thisspeed = 6;                                         // You can change the speed, and use negative values.
+    allfreq = 64;                                         // You can change the frequency, thus overall width of bars.
     thisphase = 0;                                            // Phase change value gets calculated.
     thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
   }
