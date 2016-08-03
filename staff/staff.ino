@@ -15,7 +15,7 @@ bool firstTimeRunningThroughPattern = true;
 #define NIGHT_SPARKLES 2
 #define SINGLE_COLOR_SPARKLES 3
 #define DAVE 4
-#define WORMS 5
+#define SHOOTING_GRADIENTS 5
 #define DISCO_BARBER_1 6
 #define DISCO_TWIRL 7
 #define DISCO_BARBER_2 8
@@ -51,6 +51,7 @@ uint8_t offset = 0;
 int ms = 0;
 
 // Dave's pattern. By Dave Grijalva with love.
+// A gradient background, with rotating bright points and white sparkles.
 void dave() {
   for (int k=0; k<NUM_LEDS-1; k++) {
     uint8_t k8 = k;
@@ -128,7 +129,7 @@ uint8_t wormsHueIncrement = 2; // Incremental change in hue between each dot.
 uint8_t wormsStartingHue = 180; // The current hue
 uint8_t wormsBaseBeat = 10; // Higher = faster movement.
 
-void worms() {
+void shootingGradients() {
   fadeToBlackBy(leds, NUM_LEDS, wormsFadeRate);
   for ( int i = 0; i < numberOfWorms; i++) {
     for ( int j = 0; j < 80; j++) {
@@ -146,7 +147,8 @@ int     discoBarberPhase = 0;
 uint8_t discoBarberCutoff = 120;
 uint8_t discoBarberSaturation = 240;
 
-void discoBarber() {
+// This pattern is called for both Disco Barber and Disco Barber 2.
+void discoBarbers() {
   if (patternId == DISCO_BARBER_1) {
     discoBarberFrequency = 5;
     discoBarberPhase += 24;
@@ -263,9 +265,9 @@ void loop () {
   } else if (patternId == SINGLE_COLOR_SPARKLES) {
     sparkles();
   } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
-    discoBarber();
-  } else if (patternId == WORMS) {
-    worms();
+    discoBarbers();
+  } else if (patternId == SHOOTING_GRADIENTS) {
+    shootingGradients();
   } else if (patternId == DISCO_TWIRL) {
     discoTwirl();
   } else if (patternId == DISCO_TWIRL_2) {
