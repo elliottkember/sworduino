@@ -1,6 +1,6 @@
 #include "FastLED.h"
 #define qsubd(x, b)  ((x>b)?255:0)  // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
-#define qsuba(x, b)  ((x>b)?x-b:0)         // Analog Unsigned subtraction macro. if result <0, then => 0
+#define qsuba(x, b)  ((x>b)?x-b:0)  // Analog Unsigned subtraction macro. if result <0, then => 0
 #define LED_DT 7              // Data pin to connect to the strip.
 #define COLOR_ORDER GRB       // Are they RGB, GRB or what??
 #define LED_TYPE WS2812B      // Don't forget to change LEDS.addLeds
@@ -168,56 +168,12 @@ void discoBarber() {
     }
 
     if (patternId == DISCO_BARBER_1) {
-      // original disco barber 1
-      // leds[k] += CHSV(hue+k/5, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
       leds[k] += CHSV(hue * 10 + k / 2, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
     } else {
       leds[k] += CHSV(hue * -20 + k / 4, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
     }
   }
 }
-
-//int partySeed;
-//int partySeedDirection = true;
-//
-//void party() {
-//  int partySeedLength = 1500;
-//  if (firstTimeRunningThroughPattern) {
-//    partySeed = 0;
-//  } else {
-//    partySeed += partySeedDirection ? 20 : -20;
-//    if (partySeed > NUM_LEDS - partySeedLength) {
-//      partySeedDirection = false;
-//    } else if (partySeed < 0) {
-//      partySeedDirection = true;
-//    }
-//  }
-//  EVERY_N_MILLISECONDS(100) {
-//    hue += 5;
-//  }
-//  fadeToBlackBy(leds, NUM_LEDS, 80);
-//  int brightness = 255;
-//  int saturation = 200;
-//  int pos;
-//
-//  for (int i = 0; i < 3; i++) {
-//    pos = random(partySeed - partySeedLength, partySeed + partySeedLength);
-//    for (int i = pos; i <= pos + 50; i++) {
-//      brightness *= 0.97;
-//      if (i < NUM_LEDS && i > 0) {
-//        leds[i] = CHSV(hue, saturation, brightness);
-//      }
-//    }
-//    brightness = 255;
-//    saturation = 255;
-//    for (int j = pos; j >= pos - 50; j--) {
-//      brightness *= 0.97;
-//      if (j < NUM_LEDS && j > 0) {
-//        leds[j] = CHSV(hue, saturation, brightness);
-//      }
-//    }
-//  }
-//}
 
 uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
 uint8_t thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
@@ -310,8 +266,6 @@ void loop () {
     discoBarber();
   } else if (patternId == WORMS) {
     worms();
-//  } else if (patternId == PARTY) {
-//    party();
   } else if (patternId == DISCO_TWIRL) {
     discoTwirl();
   } else if (patternId == DISCO_TWIRL_2) {
