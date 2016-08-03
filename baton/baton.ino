@@ -12,16 +12,15 @@ int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
 
 #define BEAUTIFUL_SPARKLES 1
-#define NIGHT_SPARKLES 3
-// #define SINGLE_COLOR_SPARKLES 3
 #define DAVE 2
+#define NIGHT_SPARKLES 3
 #define WORMS 4
 #define DISCO_BARBER_1 5
 #define DISCO_TWIRL 6
 #define DISCO_BARBER_2 7
 #define DISCO_TWIRL_2 8
-
 int maxPatternId = 8;
+
 int rotationInMillseconds = 8000; // 20 seconds for production
 
 bool holdPattern = false;
@@ -43,7 +42,6 @@ int ms = 0;
 
 void dave() {
 
-
   for (int k=0; k<NUM_LEDS-1; k++) {
 
     uint8_t k8 = k;
@@ -55,10 +53,6 @@ void dave() {
     }
 
     leds[k] = CHSV(hue, saturation, value);
-
-//    int thisbright = qsubd(cubicwave8((k*-allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
-//    leds[k] += CHSV(thishue + k + thisphase / 5, allsat, thisbright);                               // Assigning hues and brightness to the led array.  }
-
   }
 
   EVERY_N_MILLISECONDS(1000/24){
@@ -66,33 +60,7 @@ void dave() {
     if(ms % 3 == 0){
       offset++;
     }
-//    if(ms < 50){
-//      offset++;
-//    } else if(ms % 10 == 0){
-//      offset++;
-//    } else if(ms > 10 * 8){
-//      ms = 0;
-//    }
   }
-
-
-
-
-//  int daveDelay;
-//  EVERY_N_MILLISECONDS(1){
-//      ms += 10;
-//      uint8_t scale = 20;
-//      uint8_t ot =  ms % (scale * 2);
-//      if(ot < scale) {
-//      // Up
-//      daveDelay = ot * 2;
-//      } else {
-//        // Down
-//        daveDelay = (scale - (ot - scale))*2;
-//      }
-//  }
-//
-//  delay(daveDelay*8);
 }
 
 int numberOfSparkles = 1;
@@ -112,10 +80,6 @@ int upAndDownBy(int value, int difference) {
 }
 
 void nightSparkles() {
-//  if (firstTimeRunningThroughPattern) {
-//    hue = 200;
-//    numberOfSparkles = 10;
-//  }
   fadeToBlackBy(leds, NUM_LEDS, 180);
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
   for (int i = 0; i < numberOfSparkles * 4; i++) {
@@ -139,16 +103,6 @@ void beautifulSparkles() {
   hue += 10;
   delay(10);
 }
-
-// void sparkles() {
-//   fadeToBlackBy(leds, NUM_LEDS, 200);
-//   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
-//   for (int i = 0; i < numberOfSparkles * 4; i++) {
-//     int pos = random16(NUM_LEDS);
-//     leds[pos] = CHSV(hue, 240, 255);
-//   }
-//   hue += 1;
-// }
 
 uint8_t numberOfWorms = 4;
 uint8_t wormsFadeRate = 80; // Very low value = longer trails.
@@ -204,48 +158,6 @@ void discoBarber() {
     }
   }
 }
-
-//int partySeed;
-//int partySeedDirection = true;
-//
-//void party() {
-//  int partySeedLength = 1500;
-//  if (firstTimeRunningThroughPattern) {
-//    partySeed = 0;
-//  } else {
-//    partySeed += partySeedDirection ? 20 : -20;
-//    if (partySeed > NUM_LEDS - partySeedLength) {
-//      partySeedDirection = false;
-//    } else if (partySeed < 0) {
-//      partySeedDirection = true;
-//    }
-//  }
-//  EVERY_N_MILLISECONDS(100) {
-//    hue += 5;
-//  }
-//  fadeToBlackBy(leds, NUM_LEDS, 80);
-//  int brightness = 255;
-//  int saturation = 200;
-//  int pos;
-//
-//  for (int i = 0; i < 3; i++) {
-//    pos = random(partySeed - partySeedLength, partySeed + partySeedLength);
-//    for (int i = pos; i <= pos + 50; i++) {
-//      brightness *= 0.97;
-//      if (i < NUM_LEDS && i > 0) {
-//        leds[i] = CHSV(hue, saturation, brightness);
-//      }
-//    }
-//    brightness = 255;
-//    saturation = 255;
-//    for (int j = pos; j >= pos - 50; j--) {
-//      brightness *= 0.97;
-//      if (j < NUM_LEDS && j > 0) {
-//        leds[j] = CHSV(hue, saturation, brightness);
-//      }
-//    }
-//  }
-//}
 
 uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
 uint8_t thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
@@ -332,14 +244,10 @@ void loop () {
     nightSparkles();
   } else if (patternId == BEAUTIFUL_SPARKLES) {
     beautifulSparkles();
-  // } else if (patternId == SINGLE_COLOR_SPARKLES) {
-  //   sparkles();
   } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
     discoBarber();
   } else if (patternId == WORMS) {
     worms();
-//  } else if (patternId == PARTY) {
-//    party();
   } else if (patternId == DISCO_TWIRL) {
     discoTwirl();
   } else if (patternId == DISCO_TWIRL_2) {
