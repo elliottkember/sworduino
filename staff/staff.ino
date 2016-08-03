@@ -4,12 +4,13 @@
 #define LED_DT 7              // Data pin to connect to the strip.
 #define COLOR_ORDER GRB       // Are they RGB, GRB or what??
 #define LED_TYPE WS2812B      // Don't forget to change LEDS.addLeds
-#define NUM_LEDS 1500         // Number of LED's.
-struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 uint8_t max_bright = 255;     // Overall brightness definition. It can be changed on the fly.
 unsigned long previousMillis; // Store last time the strip was updated.
 int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
+
+#define NUM_LEDS 1500         // Number of LED's.
+struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 
 #define BEAUTIFUL_SPARKLES 1
 #define NIGHT_SPARKLES 2

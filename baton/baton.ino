@@ -1,15 +1,16 @@
 #include "FastLED.h"
 #define qsubd(x, b)  ((x>b)?255:0)  // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
-#define qsuba(x, b)  ((x>b)?x-b:0)         // Analog Unsigned subtraction macro. if result <0, then => 0
+#define qsuba(x, b)  ((x>b)?x-b:0)  // Analog Unsigned subtraction macro. if result <0, then => 0
 #define LED_DT 7              // Data pin to connect to the strip.
 #define COLOR_ORDER GRB       // Are they RGB, GRB or what??
 #define LED_TYPE WS2812B      // Don't forget to change LEDS.addLeds
-#define NUM_LEDS 300         // Number of LED's.
-struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 uint8_t max_bright = 255;     // Overall brightness definition. It can be changed on the fly.
 unsigned long previousMillis; // Store last time the strip was updated.
 int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
+
+#define NUM_LEDS 300         // Number of LED's.
+struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 
 #define BEAUTIFUL_SPARKLES 1
 #define DAVE 2
@@ -19,22 +20,31 @@ bool firstTimeRunningThroughPattern = true;
 #define DISCO_TWIRL 6
 #define DISCO_BARBER_2 7
 #define DISCO_TWIRL_2 8
-int maxPatternId = 8;
 
+int maxPatternId = 8;
 int rotationInMillseconds = 8000; // 20 seconds for production
 
+// If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
 bool holdPattern = false;
 int patternId = BEAUTIFUL_SPARKLES;
- // bool holdPattern = true;
- // int patternId = DISCO_TWIRL;
+/*
+bool holdPattern = true;
+int patternId = DISCO_TWIRL;
+*/
 
+// Set up LEDs, fade them all to black.
 void setup() {
-  delay(50);
   Serial.begin(57600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(max_bright);
   set_max_power_in_volts_and_milliamps(5, 10000);
   randomSeed(analogRead(0));
+  delay(50);
+  // Make the whole stick black on startup (helps with restarts).
+  // TODO: Test this (untested code)
+  for (int i=0; i<NUM_LEDS-1; i++) {
+    leds[i] = CHSV(0, 0, 0);
+  }
 }
 
 uint8_t offset = 0;
@@ -43,7 +53,6 @@ int ms = 0;
 void dave() {
 
   for (int k=0; k<NUM_LEDS-1; k++) {
-
     uint8_t k8 = k;
     uint8_t hue = (k/15 * 255) + (offset*5);
     uint8_t saturation = rand() % 255 > 252 ? 0 : 255; //NUM_LEDS - (k+offset*10);
@@ -123,8 +132,8 @@ void worms() {
   }
 }
 
-uint8_t discoBarberFrequency = 3;
 int     discoBarberPhase = 0;
+uint8_t discoBarberFrequency = 3;
 uint8_t discoBarberCutoff = 120;
 uint8_t discoBarberSaturation = 240;
 
@@ -159,28 +168,28 @@ void discoBarber() {
   }
 }
 
-uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
-uint8_t thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
-uint8_t allsat = 255;                                         // I like 'em fully saturated with colour.
-bool thisdir = 0;                                             // You can change direction.
-int8_t thisspeed = 16;                                         // You can change the speed, and use negative values.
-uint8_t allfreq = 1;                                         // You can change the frequency, thus overall width of bars.
 int thisphase = 0;                                            // Phase change value gets calculated.
+bool fadeUp = 0;
+bool thisdir = 0;                                             // You can change direction.
+uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
+uint8_t thisrot = 18;                                         // You can change how quickly the hue rotates for this wave. Currently 0.
+uint8_t allsat = 255;                                         // I like 'em fully saturated with colour.
+int8_t thisspeed = 16;                                        // You can change the speed, and use negative values.
+uint8_t allfreq = 1;                                          // You can change the frequency, thus overall width of bars.
 uint8_t thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
 uint8_t fade = 200;
-bool fadeUp = 0;
 
 void discoTwirl() {
 
   if (firstTimeRunningThroughPattern) {
-    thishue = 0;                                          // You can change the starting hue value for the first wave.
+    thishue = 0;                                           // You can change the starting hue value for the first wave.
     thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
-    allsat = 180;                                         // I like 'em fully saturated with colour.
-    thisdir = 0;                                             // You can change direction.
+    allsat = 180;                                          // I like 'em fully saturated with colour.
+    thisdir = 0;                                           // You can change direction.
     thisspeed = 8;                                         // You can change the speed, and use negative values.
-    allfreq = 4;                                         // You can change the frequency, thus overall width of bars.
-    thisphase = 0;                                            // Phase change value gets calculated.
-    thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+    allfreq = 4;                                           // You can change the frequency, thus overall width of bars.
+    thisphase = 0;                                         // Phase change value gets calculated.
+    thiscutoff = 200;                                      // You can change the cutoff value to display this wave. Lower value = longer wave.
     fade = 200;
     fadeUp = 1;
     fadeToBlackBy(leds, NUM_LEDS, 255);
@@ -255,7 +264,6 @@ void loop () {
   } else if (patternId == DAVE) {
     dave();
   }
-
 
   firstTimeRunningThroughPattern = false;
 
