@@ -24,18 +24,27 @@ bool firstTimeRunningThroughPattern = true;
 int maxPatternId = 9;
 int rotationInMillseconds = 20000; // 20 seconds for production
 
+// If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
 bool holdPattern = false;
 int patternId = BEAUTIFUL_SPARKLES;
-// bool holdPattern = true;
-// int patternId = DISCO_TWIRL;
+/*
+bool holdPattern = true;
+int patternId = DISCO_TWIRL;
+*/
 
+// Set up LEDs, fade them all to black.
 void setup() {
-  delay(50);
   Serial.begin(57600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(max_bright);
   set_max_power_in_volts_and_milliamps(5, 10000);
   randomSeed(analogRead(0));
+  delay(50);
+  // Make the whole stick black on startup (helps with restarts).
+  // TODO: Test this (untested code)
+  for (int i=0; i<NUM_LEDS-1; i++) {
+    leds[i] = CHSV(0, 0, 0);
+  }
 }
 
 uint8_t offset = 0;
