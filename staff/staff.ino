@@ -73,10 +73,10 @@ void dave() {
 
 int numberOfSparkles = 1;
 bool increasing = true;
-int upAndDownBy(int value, int difference) {
-  if (value < 80 && increasing) {
+int upAndDownBy(int value, int difference, int max, int min) {
+  if (value < max && increasing) {
     value += difference;
-  } else if (value > 5) {
+  } else if (value > min) {
     value -= difference;
     increasing = false;
   } else {
@@ -92,7 +92,7 @@ void nightSparkles() {
     numberOfSparkles = 40;
   }
   fadeToBlackBy(leds, NUM_LEDS, 180);
-  numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
+  numberOfSparkles = upAndDownBy(numberOfSparkles, 1, 80, 5);
   for (int i = 0; i < numberOfSparkles * 2; i++) {
     int pos = random16(NUM_LEDS);
     leds[pos] = CHSV(hue, 180, 255);
@@ -105,7 +105,7 @@ void nightSparkles() {
 
 void beautifulSparkles() {
   fadeToBlackBy(leds, NUM_LEDS, 200);
-  numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
+  numberOfSparkles = upAndDownBy(numberOfSparkles, 1, 80, 5);
   for (int i = 0; i < numberOfSparkles * 4; i++) {
     int pos = random16(NUM_LEDS);
     leds[pos] = CHSV(hue + (pos / 10), 240, 255);
@@ -115,7 +115,7 @@ void beautifulSparkles() {
 
 void sparkles() {
   fadeToBlackBy(leds, NUM_LEDS, 200);
-  numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
+  numberOfSparkles = upAndDownBy(numberOfSparkles, 1, 80, 5);
   for (int i = 0; i < numberOfSparkles * 4; i++) {
     int pos = random16(NUM_LEDS);
     leds[pos] = CHSV(hue, 240, 255);
