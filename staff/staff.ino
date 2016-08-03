@@ -276,7 +276,6 @@ void loop () {
     dave();
   }
 
-
   firstTimeRunningThroughPattern = false;
 
   show_at_max_brightness_for_power();
