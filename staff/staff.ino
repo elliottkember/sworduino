@@ -170,35 +170,35 @@ void discoBarbers() {
     }
 
     if (patternId == DISCO_BARBER_1) {
-      leds[k] += CHSV(hue * 10 + k / 2, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
+      leds[k] += CHSV(hue * 10 + k / 2, discoBarberSaturation, _brightness);
     } else {
-      leds[k] += CHSV(hue * -20 + k / 4, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
+      leds[k] += CHSV(hue * -20 + k / 4, discoBarberSaturation, _brightness);
     }
   }
 }
 
-uint8_t thishue = 0;                                          // You can change the starting hue value for the first wave.
-uint8_t thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
-uint8_t allsat = 255;                                         // I like 'em fully saturated with colour.
-bool thisdir = 0;                                             // You can change direction.
-int8_t thisspeed = 16;                                         // You can change the speed, and use negative values.
-uint8_t allfreq = 1;                                         // You can change the frequency, thus overall width of bars.
-int thisphase = 0;                                            // Phase change value gets calculated.
-uint8_t thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
-uint8_t fade = 200;
+int thisphase = 0;                // Phase change value gets calculated.
 bool fadeUp = 0;
+bool thisdir = 0;                 // You can change direction.
+int8_t thisspeed = 16;            // You can change the speed, and use negative values.
+uint8_t thishue = 0;              // You can change the starting hue value for the first wave.
+uint8_t thisrot = 18;             // You can change how quickly the hue rotates for this wave. Currently 0.
+uint8_t allsat = 255;             // I like 'em fully saturated with colour.
+uint8_t allfreq = 1;              // You can change the frequency, thus overall width of bars.
+uint8_t thiscutoff = 200;         // You can change the cutoff value to display this wave. Lower value = longer wave.
+uint8_t fade = 200;
 
 void discoTwirl() {
 
   if (firstTimeRunningThroughPattern) {
-    thishue = 0;                                          // You can change the starting hue value for the first wave.
-    thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
-    allsat = 180;                                         // I like 'em fully saturated with colour.
-    thisdir = 0;                                             // You can change direction.
-    thisspeed = 8;                                         // You can change the speed, and use negative values.
-    allfreq = 4;                                         // You can change the frequency, thus overall width of bars.
-    thisphase = 0;                                            // Phase change value gets calculated.
-    thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+    thishue = 0;           // You can change the starting hue value for the first wave.
+    thisrot = 18;          // You can change how quickly the hue rotates for this wave. Currently 0.
+    allsat = 180;          // I like 'em fully saturated with colour.
+    thisdir = 0;           // You can change direction.
+    thisspeed = 8;         // You can change the speed, and use negative values.
+    allfreq = 4;           // You can change the frequency, thus overall width of bars.
+    thisphase = 0;         // Phase change value gets calculated.
+    thiscutoff = 200;      // You can change the cutoff value to display this wave. Lower value = longer wave.
     fade = 200;
     fadeUp = 1;
     fadeToBlackBy(leds, NUM_LEDS, 255);
