@@ -21,17 +21,18 @@ struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 #define DISCO_TWIRL 7
 #define DISCO_BARBER_2 8
 #define DISCO_TWIRL_2 9
+#define NEWPATTERN 10
 
 int maxPatternId = 9;
-int rotationInMillseconds = 20000; // 20 seconds for production
+int rotationInMillseconds = 30000; // 20 seconds for production
 
 // If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
-bool holdPattern = false;
-int patternId = BEAUTIFUL_SPARKLES;
-/*
+//bool holdPattern = false;
+//int patternId = BEAUTIFUL_SPARKLES;
+
 bool holdPattern = true;
-int patternId = DISCO_TWIRL;
-*/
+int patternId = NEWPATTERN;
+
 
 // Set up LEDs, fade them all to black.
 void setup() {
@@ -249,6 +250,31 @@ void discoTwirl2() {
   }
 }
 
+int newPatternI = 0;
+int newPatternDiagonal = float(2.0);
+void newPattern() {
+  newPatternI+=0.72;
+
+  if (newPatternI >= newPatternDiagonal) {
+    newPatternI = 2.0;
+  }
+
+  for (int newPatternIterator=0; newPatternIterator<NUM_LEDS; newPatternIterator++) {
+    if (newPatternIterator % newPatternDiagonal == newPatternI) {
+      leds[newPatternIterator] = CRGB(0, 255, 0);
+    } else {
+      leds[newPatternIterator] = CRGB(0, 0, 0);
+    }
+  }
+
+  EVERY_N_MILLISECONDS(1) {
+    newPatternDiagonal++;
+    if (newPatternDiagonal > 2000) {
+      newPatternDiagonal = 0;
+    }
+  }
+}
+
 void loop () {
   if (!holdPattern) {
     EVERY_N_MILLISECONDS(rotationInMillseconds) {
@@ -276,6 +302,8 @@ void loop () {
     discoTwirl2();
   } else if (patternId == DAVE) {
     dave();
+  } else if (patternId == NEWPATTERN) {
+    newPattern();
   }
 
   firstTimeRunningThroughPattern = false;
