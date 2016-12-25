@@ -23,15 +23,15 @@ struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 #define DISCO_TWIRL_2 9
 
 int maxPatternId = 9;
-int rotationInMillseconds = 20000; // 20 seconds for production
+int rotationInMillseconds = 50000; // 20 seconds for production
 
-// If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
+// If we're testing one pattern, use holdPattern as true and the patternId as the startingu pattern.
 bool holdPattern = false;
 int patternId = BEAUTIFUL_SPARKLES;
-/*
-bool holdPattern = true;
-int patternId = DISCO_TWIRL;
-*/
+
+//bool holdPattern = true;
+//int patternId = NIGHT_SPARKLES;
+
 
 // Set up LEDs, fade them all to black.
 void setup() {
@@ -44,8 +44,10 @@ void setup() {
   // Make the whole stick black on startup (helps with restarts).
   // TODO: Test this (untested code)
   for (int i=0; i<NUM_LEDS-1; i++) {
-    leds[i] = CHSV(0, 0, 0);
+    leds[i] = CRGB(0, 0, 0);
   }
+  show_at_max_brightness_for_power();
+  delay(80);
 }
 
 uint8_t daveOffset = 0;
@@ -88,21 +90,52 @@ int upAndDownBy(int value, int difference, int max, int min) {
   return value;
 }
 
-void nightSparkles() {
+void oldNightSparkles() {
   if (firstTimeRunningThroughPattern) {
     hue = 32;
-    numberOfSparkles = 40;
+    numberOfSparkles = 10;
   }
-  fadeToBlackBy(leds, NUM_LEDS, 180);
-  numberOfSparkles = upAndDownBy(numberOfSparkles, 1, 80, 5);
-  for (int i = 0; i < numberOfSparkles * 2; i++) {
+
+  fadeToBlackBy(leds, NUM_LEDS, 200);
+  numberOfSparkles = upAndDownBy(numberOfSparkles, 1, 30, 1);
+  for (int i = 0; i < numberOfSparkles; i++) {
     int pos = random16(NUM_LEDS);
-    leds[pos] = CHSV(hue, 180, 255);
+    leds[pos] = leds[pos-8];
+    leds[pos-8] = CHSV(0, 0, 0);
+    leds[pos] = CHSV(hue+(pos / 18), 100+((double)pos/(double)NUM_LEDS)*255.0, 255);
   }
-  for (int i = 0; i < numberOfSparkles * 8; i++) {
-    leds[random16(NUM_LEDS)] = CHSV(hue, 200, 20);
+}
+
+int frameSize = 8;
+uint8_t counter = 0;
+void nightSparkles() {
+  
+  if (firstTimeRunningThroughPattern) {
+    for (int i = NUM_LEDS; i > 0; i--) {
+      int on = random(100) > 80 ? 255 : 0;
+      leds[i] = CHSV(hue, 255, on);
+      counter++;
+      if (counter == 20) {
+        hue++;
+        counter = 0;
+      }
+    }
+  } else {
+//    EVERY_N_MILLISECONDS(100) {
+      for (int i = NUM_LEDS; i > frameSize; i--) {
+        leds[i] = leds[i-frameSize];
+      }
+      for (int i = 0; i <= frameSize + 1; i++) {
+        int on = random(100) > 80 ? 255 : 0;
+        leds[i] = CHSV(hue, 255, on);
+        counter++;
+        if (counter == 20) {
+          hue--;
+          counter = 0;
+        }
+      }
+//    }
   }
-  hue += 1;
 }
 
 void beautifulSparkles() {

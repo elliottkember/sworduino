@@ -9,7 +9,7 @@ unsigned long previousMillis; // Store last time the strip was updated.
 int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
 
-#define NUM_LEDS 300         // Number of LED's.
+#define NUM_LEDS 600         // Number of LED's.
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 
 #define BEAUTIFUL_SPARKLES 1
@@ -22,10 +22,10 @@ struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 #define DISCO_TWIRL_2 8
 
 int maxPatternId = 8;
-int rotationInMillseconds = 8000; // 20 seconds for production
+int rotationInMillseconds = 20000;
 
 // If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
-bool holdPattern = false;
+bool holdPattern = true;
 int patternId = BEAUTIFUL_SPARKLES;
 /*
 bool holdPattern = true;
@@ -69,6 +69,43 @@ void dave() {
     if(ms % 3 == 0){
       offset++;
     }
+  }
+}
+
+
+void verticalLines() {
+  struct CRGB colors[8];
+
+//  for (int i = 0; i < numberOfSparkles * 4; i++) {
+  for (int i = 0; i < 8; i++) {
+    colors[i] = CHSV(offset, ((256/8) * i) + offset, ((256/8) * i) + offset);
+  }
+
+  for (int k=0; k<NUM_LEDS-1; k++) {
+    leds[k] = colors[k % 8];
+  }
+
+  offset += 20;
+  // @todo progress colours in some fashion.
+}
+
+int     discoBarberPhase = 0;
+uint8_t discoBarberFrequency = 10;
+uint8_t discoBarberCutoff = 30;
+uint8_t discoBarberSaturation = 240;
+
+void barbershop() {
+//  hue = hue + 1;
+  hue = 0;
+
+  discoBarberFrequency = 8;
+  discoBarberPhase -= 10;
+
+  for (int k = 0; k < NUM_LEDS - 1; k++) {
+    // qsub sets a minimum value called discoBarberCutoff. If < discoBarberCutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    int _brightness = qsubd(cubicwave8((k * discoBarberFrequency) + discoBarberPhase), discoBarberCutoff);
+    leds[k] = CHSV(0, 0, 0);
+    leds[k] = CHSV(hue * -20, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
   }
 }
 
@@ -132,10 +169,10 @@ void worms() {
   }
 }
 
-int     discoBarberPhase = 0;
-uint8_t discoBarberFrequency = 3;
-uint8_t discoBarberCutoff = 120;
-uint8_t discoBarberSaturation = 240;
+//int     discoBarberPhase = 0;
+//uint8_t discoBarberFrequency = 3;
+//uint8_t discoBarberCutoff = 120;
+//uint8_t discoBarberSaturation = 240;
 
 void discoBarber() {
   if (patternId == DISCO_BARBER_1) {
@@ -213,7 +250,7 @@ void discoTwirl2() {
   if (firstTimeRunningThroughPattern) {
     thishue = 0;                                          // You can change the starting hue value for the first wave.
     thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
-    allsat = 255;                                         // I like 'em fully saturated with colour.u¨
+    allsat = 255;                                         // I like 'em fully saturated with colour.
     thisdir = 0;                                             // You can change direction.
     thisspeed = 16;                                         // You can change the speed, and use negative values.
     allfreq = 1;                                         // You can change the frequency, thus overall width of bars.
@@ -249,24 +286,26 @@ void loop () {
     }
   }
 
-  if (patternId == NIGHT_SPARKLES) {
-    nightSparkles();
-  } else if (patternId == BEAUTIFUL_SPARKLES) {
-    beautifulSparkles();
-  } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
-    discoBarber();
-  } else if (patternId == WORMS) {
-    worms();
-  } else if (patternId == DISCO_TWIRL) {
-    discoTwirl();
-  } else if (patternId == DISCO_TWIRL_2) {
-    discoTwirl2();
-  } else if (patternId == DAVE) {
-    dave();
+  EVERY_N_MILLISECONDS(1000/30) {
+    if (patternId == NIGHT_SPARKLES) {
+      nightSparkles();
+    } else if (patternId == BEAUTIFUL_SPARKLES) {
+      beautifulSparkles();
+    } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
+      discoBarber();
+    } else if (patternId == WORMS) {
+      worms();
+    } else if (patternId == DISCO_TWIRL) {
+      discoTwirl();
+    } else if (patternId == DISCO_TWIRL_2) {
+      discoTwirl2();
+    } else if (patternId == DAVE) {
+      dave();
+    }
   }
 
   firstTimeRunningThroughPattern = false;
 
   show_at_max_brightness_for_power();
-  delay(1000/30);
+  delay(1000/60);
 }

@@ -9,8 +9,8 @@
 #define NUM_LEDS 1500
 #define MAX_DELTA 16
 #define MAX_BRIGHTNESS 48
-#define MIN_BRIGHTNESS 2
-#define MAX_DROPS 6
+#define MIN_BRIGHTNESS 0
+#define MAX_DROPS 2
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 struct CRGB stein_next[NUM_LEDS]; 
 
@@ -29,9 +29,15 @@ void setup() {
 }
 
 int counter;
-int GAIN_NUM [3] = {10, 10, 10};
+int GAIN_NUM [3] = {12, 12, 12};
 
-void loop() {
+void loop(){
+//  EVERY_N_MILLISECONDS(15) {
+    stein();
+//  }
+}
+
+void stein() {
   counter++;
   if (counter % 5 == 0){
     int hue_target = random(270);
