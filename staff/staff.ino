@@ -90,26 +90,10 @@ int upAndDownBy(int value, int difference, int max, int min) {
   return value;
 }
 
-void oldNightSparkles() {
-  if (firstTimeRunningThroughPattern) {
-    hue = 32;
-    numberOfSparkles = 10;
-  }
-
-  fadeToBlackBy(leds, NUM_LEDS, 200);
-  numberOfSparkles = upAndDownBy(numberOfSparkles, 1, 30, 1);
-  for (int i = 0; i < numberOfSparkles; i++) {
-    int pos = random16(NUM_LEDS);
-    leds[pos] = leds[pos-8];
-    leds[pos-8] = CHSV(0, 0, 0);
-    leds[pos] = CHSV(hue+(pos / 18), 100+((double)pos/(double)NUM_LEDS)*255.0, 255);
-  }
-}
-
 int frameSize = 8;
 uint8_t counter = 0;
 void nightSparkles() {
-  
+
   if (firstTimeRunningThroughPattern) {
     for (int i = NUM_LEDS; i > 0; i--) {
       int on = random(100) > 80 ? 255 : 0;
