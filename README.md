@@ -1,6 +1,6 @@
 # The Staff
 
-This code runs on Elliott's LED light staff, JOY. Each pattern is a function that modifies the "leds" array of CRGB values. 
+This code runs on Elliott's LED light staff. Each pattern is a function that modifies the "leds" array of CRGB values. 
 
 - I'm using the [FastLED](https://github.com/FastLED/FastLED) library to run the patterns.
 - I'm also using a Teensy board, so you'll need [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html) to upload the code.
