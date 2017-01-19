@@ -19,7 +19,7 @@ is away from the "mesh"
 
 #define VEL_DAMPING .9 // number between 0 and 1;
 #define MAX_VEL 1.5
-#define FALL_SPEED 30
+#define FALL_SPEED 100
 
 struct CRGB leds[TRUE_LED_COUNT];
 float aleds_vel[NUM_LEDS];
@@ -133,30 +133,19 @@ CRGB bright2CRGB(float brightness){
 
 CRGB dualbright2CRGB(float abright, float bbright){
   float r=0, b=0, g=0;
-  // if (abright > 0) {
-  //   r += abright / 2;
-  //   b += abright;
-  // } else if (abright <= 0) {
-  //   b -= 2 * abright / 3;
-  //   g -= abright / 5;
-  // }
-  // if (bbright > 0) {
-  //   r += 2 * bbright / 3;
-  //   g += bbright / 4;
-  // } else if (bbright <= 0) {
-  //   r -= bbright;
-  // }
   if (abright > 0) {
-    r += abright;
+    r += abright / 2;
+    b += abright;
   } else if (abright <= 0) {
-    b -= abright;
+    b -= 2 * abright / 3;
+    g -= abright / 5;
   }
   if (bbright > 0) {
     r += bbright;
-    g += bbright / 4;
+    b += bbright/3;
   } else if (bbright <= 0) {
-    b -= bbright;
-    g -= bbright / 4;
+    b -= abright / 2;
+    g -= abright / 5;
   }
   return CRGB(r/2, g/2, 2 * b/3);
 }
@@ -171,13 +160,13 @@ void rain() {
     bnext_leds_brightness[i] = next_for_idx(i, bleds_brightness, bleds_vel);
   }
   if (random(10) == 0){
-    if (atoggle) anext_leds_brightness[random(NUM_LEDS)] = 30.0;
-    else anext_leds_brightness[random(NUM_LEDS)] = - 30.0;
+    if (atoggle) anext_leds_brightness[random(NUM_LEDS)] = 60.0;
+    else anext_leds_brightness[random(NUM_LEDS)] = - 60.0;
     atoggle = !atoggle;
   }
   if (random(10) == 0){
-    if (btoggle) bnext_leds_brightness[random(NUM_LEDS)] = 30.0;
-    else bnext_leds_brightness[random(NUM_LEDS)] = - 30.0;
+    if (btoggle) bnext_leds_brightness[random(NUM_LEDS)] = 60.0;
+    else bnext_leds_brightness[random(NUM_LEDS)] = - 60.0;
     btoggle = !btoggle;
   }
   for (int k = 0; k<NUM_LEDS; k++){
