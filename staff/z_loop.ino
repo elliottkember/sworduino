@@ -16,6 +16,7 @@ void (*patterns[])() = {
 int patternId = 0;
 int maxPatternId = sizeof( patterns ) / sizeof(patterns[0]);
 void loop () {
+  FastLED.setBrightness(Global::max_bright);
   Global::firstTimeRunningThroughPattern = true;
   uint endTime = millis() + rotationInMillseconds;
   while (millis() < endTime) {
