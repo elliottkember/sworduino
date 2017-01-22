@@ -2,7 +2,7 @@ namespace DiscoBarbers {
 
   int frequency;
   int phase;
-  int hue = 0;
+  // int hue = 0;
   uint8_t cutoff = 120;
   uint8_t saturation = 240;
 
@@ -16,7 +16,7 @@ namespace DiscoBarbers {
         if (random16(1000) > 995) { return CHSV(255, 0, 255); }
       }
       // if (random16(1000) > 996) { return CHSV(255, 0, 64); }
-      return CHSV(hue * 10 + k, saturation, _brightness);
+      return CHSV(Global::hue * 10 + k, saturation, _brightness);
     });
   }
 
@@ -28,7 +28,7 @@ namespace DiscoBarbers {
     Global::printPixels([](int k) -> CRGB {
       if (random16(1000) > 996) { return CHSV(255, 0, 255); }
       int _brightness = qsubd(cubicwave8((k * frequency) + phase), cutoff);
-      return CHSV(hue * -20 + k / 4, saturation, _brightness);
+      return CHSV(Global::hue * -20 + k / 4, saturation, _brightness);
     });
   }
 
@@ -58,8 +58,9 @@ namespace DiscoBarbers {
           zoom = false;
         }
       }
+      
       Global::printPixels([](int k) -> CRGB {
-        int _h = counter + ((double)k / (double)NUM_LEDS) * 30.0; // quadwave8(counter); // hue * 10 + k;
+        int _h = counter + ((double)k / (double)NUM_LEDS) * 30.0; // quadwave8(counter); // Global::hue * 10 + k;
         int _s = 255 - quadwave8(255 / k);
         int _v = max(0, quadwave8(counter * 10 + k / 2) - interference);
         return CHSV(_h, _s, _v);
@@ -72,7 +73,7 @@ namespace DiscoBarbers {
   }
 
   void discoBarbers(int (*calculateHue)(int, int)) {
-    hue = hue + 1;
+    Global::hue = Global::hue + 1;
     for (int k = 0; k < NUM_LEDS - 1; k++) {
       // qsub sets a minimum value called cutoff.
       // If < cutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
@@ -80,7 +81,7 @@ namespace DiscoBarbers {
       Global::leds[k] = CHSV(0, 0, 0);                                        // First set a background colour, but fully saturated.
       // Sparkles!
       if (random16(1000) > 996) { Global::leds[k] = CHSV(255, 0, 255); }
-      Global::leds[k] += CHSV(calculateHue(k, hue) / 4, saturation, _brightness);
+      Global::leds[k] += CHSV(calculateHue(k, Global::hue) / 4, saturation, _brightness);
     }
   }
 }
