@@ -11,7 +11,7 @@ uint8_t fade = 200;
 
 void discoTwirl() {
 
-  if (firstTimeRunningThroughPattern) {
+  if (Global::firstTimeRunningThroughPattern) {
     thishue = 0;           // You can change the starting hue value for the first wave.
     thisrot = 18;          // You can change how quickly the hue rotates for this wave. Currently 0.
     allsat = 180;          // I like 'em fully saturated with colour.
@@ -22,7 +22,7 @@ void discoTwirl() {
     thiscutoff = 200;      // You can change the cutoff value to display this wave. Lower value = longer wave.
     fade = 200;
     fadeUp = 1;
-    fadeToBlackBy(leds, NUM_LEDS, 255);
+    fadeToBlackBy(Global::leds, NUM_LEDS, 255);
   } else {
     EVERY_N_MILLISECONDS(2) {
       if (fadeUp) fade += 10; else fade -= 10;
@@ -31,16 +31,16 @@ void discoTwirl() {
   }
 
   if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
-  fadeToBlackBy(leds, NUM_LEDS, fade);
+  fadeToBlackBy(Global::leds, NUM_LEDS, fade);
   for (int k=0; k<NUM_LEDS-1; k++) {
     int thisbright = cubicwave8((k*-allfreq)+thisphase);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
-    leds[k] += CHSV(thishue + k + thisphase / 5, 200, thisbright);                               // Assigning hues and brightness to the led array.
+    Global::leds[k] += CHSV(thishue + k + thisphase / 5, 200, thisbright);                               // Assigning hues and brightness to the led array.
   }
 }
 
 void discoTwirl2() {
 
-  if (firstTimeRunningThroughPattern) {
+  if (Global::firstTimeRunningThroughPattern) {
     thishue = 0;                                          // You can change the starting hue value for the first wave.
     thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
     allsat = 255;                                         // I like 'em fully saturated with colour.u¨
@@ -60,9 +60,9 @@ void discoTwirl2() {
     thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
   }
   if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
-  fadeToBlackBy(leds, NUM_LEDS, fade);
+  fadeToBlackBy(Global::leds, NUM_LEDS, fade);
   for (int k=0; k<NUM_LEDS-1; k++) {
     int thisbright = qsubd(cubicwave8((k*-allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
-    leds[k] += CHSV(thishue + k + thisphase / 5, allsat, thisbright);                               // Assigning hues and brightness to the led array.  }
+    Global::leds[k] += CHSV(thishue + k + thisphase / 5, allsat, thisbright);                               // Assigning hues and brightness to the led array.  }
   }
 }

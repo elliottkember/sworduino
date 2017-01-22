@@ -11,7 +11,7 @@ void dave() {
     if(saturation == 0){
       value = 255;
     }
-    leds[k] = CHSV(hue, saturation, value);
+    Global::leds[k] = CHSV(hue, saturation, value);
   }
   EVERY_N_MILLISECONDS(1000/24){
     daveMilliseconds++;

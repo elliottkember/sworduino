@@ -1,13 +1,14 @@
 namespace DiscoBarbers {
-  
+
   int frequency;
   int phase;
+  int hue = 0;
   uint8_t cutoff = 120;
   uint8_t saturation = 240;
 
   void printPixels(CRGB (*calculatePixel)(int)) {
     for (int k = 0; k < NUM_LEDS - 1; k++) {
-      leds[k] = calculatePixel(k);
+      Global::leds[k] = calculatePixel(k);
     }
   }
 
@@ -18,9 +19,9 @@ namespace DiscoBarbers {
     printPixels([](int k) -> CRGB {
       int _brightness = qsubd(cubicwave8((k * frequency) + phase), cutoff);
       if (_brightness == 0) {
-        if (random8(1000) > 995) { return CHSV(255, 0, 255); }
+        if (random16(1000) > 995) { return CHSV(255, 0, 255); }
       }
-      // if (random8(1000) > 996) { return CHSV(255, 0, 64); }
+      // if (random16(1000) > 996) { return CHSV(255, 0, 64); }
       return CHSV(hue * 10 + k, saturation, _brightness);
     });
   }
@@ -31,7 +32,7 @@ namespace DiscoBarbers {
     saturation = 240;
     frequency = 3;
     printPixels([](int k) -> CRGB {
-      if (random8(1000) > 996) { return CHSV(255, 0, 255); }
+      if (random16(1000) > 996) { return CHSV(255, 0, 255); }
       int _brightness = qsubd(cubicwave8((k * frequency) + phase), cutoff);
       return CHSV(hue * -20 + k / 4, saturation, _brightness);
     });
@@ -82,10 +83,10 @@ namespace DiscoBarbers {
       // qsub sets a minimum value called cutoff.
       // If < cutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
       int _brightness = qsubd(cubicwave8((k * frequency) + phase), cutoff);
-      leds[k] = CHSV(0, 0, 0);                                        // First set a background colour, but fully saturated.
+      Global::leds[k] = CHSV(0, 0, 0);                                        // First set a background colour, but fully saturated.
       // Sparkles!
-      if (random8(1000) > 996) { leds[k] = CHSV(255, 0, 255); }
-      leds[k] += CHSV(calculateHue(k, hue) / 4, saturation, _brightness);
+      if (random16(1000) > 996) { Global::leds[k] = CHSV(255, 0, 255); }
+      Global::leds[k] += CHSV(calculateHue(k, hue) / 4, saturation, _brightness);
     }
   }
 }

@@ -16,15 +16,15 @@ void (*patterns[])() = {
 int patternId = 0;
 int maxPatternId = sizeof( patterns ) / sizeof(patterns[0]);
 void loop () {
-  firstTimeRunningThroughPattern = true;
-  int endTime = millis() + rotationInMillseconds;
+  Global::firstTimeRunningThroughPattern = true;
+  uint endTime = millis() + rotationInMillseconds;
   while (millis() < endTime) {
     patterns[patternId]();
-    firstTimeRunningThroughPattern = false;
+    Global::firstTimeRunningThroughPattern = false;
     show_at_max_brightness_for_power();
   }
   if (maxPatternId > 1) {
-    firstTimeRunningThroughPattern = true;
+    Global::firstTimeRunningThroughPattern = true;
     if (++patternId == maxPatternId) { patternId = 0; }
   }
 }
