@@ -38,3 +38,31 @@ void discoTwirl() {
   }
 }
 
+void discoTwirl2() {
+
+  if (firstTimeRunningThroughPattern) {
+    thishue = 0;                                          // You can change the starting hue value for the first wave.
+    thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
+    allsat = 255;                                         // I like 'em fully saturated with colour.u¨
+    thisdir = 0;                                             // You can change direction.
+    thisspeed = 16;                                         // You can change the speed, and use negative values.
+    allfreq = 1;                                         // You can change the frequency, thus overall width of bars.
+    thisphase = 0;                                            // Phase change value gets calculated.
+    thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+    fade = 200;
+    fadeUp = 0;
+    thisrot = 0;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
+    allsat = 255;                                         // I like 'em fully saturated with colour.
+    thisdir = 0;                                             // You can change direction.
+    thisspeed = 32;                                         // You can change the speed, and use negative values.
+    allfreq = 32;                                         // You can change the frequency, thus overall width of bars.
+    thisphase = 0;                                            // Phase change value gets calculated.
+    thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
+  }
+  if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
+  fadeToBlackBy(leds, NUM_LEDS, fade);
+  for (int k=0; k<NUM_LEDS-1; k++) {
+    int thisbright = qsubd(cubicwave8((k*-allfreq)+thisphase), thiscutoff);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    leds[k] += CHSV(thishue + k + thisphase / 5, allsat, thisbright);                               // Assigning hues and brightness to the led array.  }
+  }
+}

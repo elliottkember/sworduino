@@ -27,7 +27,7 @@ int rotationInMillseconds = 50000; // 20 seconds for production
 
 // If we're testing one pattern, use holdPattern as true and the patternId as the startingu pattern.
 bool holdPattern = false;
-int patternId = BEAUTIFUL_SPARKLES;s
+int patternId = BEAUTIFUL_SPARKLES;
 
 // Set up LEDs, fade them all to black.
 void setup() {

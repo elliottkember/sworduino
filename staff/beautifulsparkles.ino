@@ -1,3 +1,4 @@
+int numberOfSparkles = 0;
 void beautifulSparkles() {
   fadeToBlackBy(leds, NUM_LEDS, 200);
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1, 80, 5);
