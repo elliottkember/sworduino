@@ -1,4 +1,5 @@
 /*
+Rain 3 by Stein
 simlated a mesh of springs, where brightness is the height each light
 is away from the "mesh"
 */
