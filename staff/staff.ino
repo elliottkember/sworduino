@@ -6,6 +6,12 @@ namespace Global {
   bool firstTimeRunningThroughPattern = false;
   int hue = 50;
   uint8_t max_bright = 80;
+
+  void printPixels(CRGB (*calculatePixel)(int)) {
+    for (int k = 0; k < NUM_LEDS - 1; k++) {
+      leds[k] = calculatePixel(k);
+    }
+  }
 }
 
 void setup() {

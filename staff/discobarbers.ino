@@ -6,17 +6,11 @@ namespace DiscoBarbers {
   uint8_t cutoff = 120;
   uint8_t saturation = 240;
 
-  void printPixels(CRGB (*calculatePixel)(int)) {
-    for (int k = 0; k < NUM_LEDS - 1; k++) {
-      Global::leds[k] = calculatePixel(k);
-    }
-  }
-
   void discoBarber1() {
     frequency = 5;
     phase += 24;
     // Special CPP11 closure syntax
-    printPixels([](int k) -> CRGB {
+    Global::printPixels([](int k) -> CRGB {
       int _brightness = qsubd(cubicwave8((k * frequency) + phase), cutoff);
       if (_brightness == 0) {
         if (random16(1000) > 995) { return CHSV(255, 0, 255); }
@@ -31,7 +25,7 @@ namespace DiscoBarbers {
     // cutoff = 120;
     saturation = 240;
     frequency = 3;
-    printPixels([](int k) -> CRGB {
+    Global::printPixels([](int k) -> CRGB {
       if (random16(1000) > 996) { return CHSV(255, 0, 255); }
       int _brightness = qsubd(cubicwave8((k * frequency) + phase), cutoff);
       return CHSV(hue * -20 + k / 4, saturation, _brightness);
@@ -64,7 +58,7 @@ namespace DiscoBarbers {
           zoom = false;
         }
       }
-      printPixels([](int k) -> CRGB {
+      Global::printPixels([](int k) -> CRGB {
         int _h = counter + ((double)k / (double)NUM_LEDS) * 30.0; // quadwave8(counter); // hue * 10 + k;
         int _s = 255 - quadwave8(255 / k);
         int _v = max(0, quadwave8(counter * 10 + k / 2) - interference);
