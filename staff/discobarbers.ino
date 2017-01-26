@@ -62,7 +62,7 @@ namespace DiscoBarbers {
       Global::printPixels([](int k) -> CRGB {
         int _h = counter + ((double)k / (double)NUM_LEDS) * 30.0; // quadwave8(counter); // Global::hue * 10 + k;
         int _s = 255 - quadwave8(255 / k);
-        int _v = max(0, quadwave8(counter * 10 + k / 2) - interference);
+        int _v = _max(0, quadwave8(counter * 10 + k / 2) - interference);
         return CHSV(_h, _s, _v);
       });
     }
