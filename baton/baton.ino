@@ -9,7 +9,7 @@ unsigned long previousMillis; // Store last time the strip was updated.
 int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
 
-#define NUM_LEDS 600         // Number of LED's.
+#define NUM_LEDS 300         // Number of LED's.
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 
 #define BEAUTIFUL_SPARKLES 1
@@ -20,9 +20,10 @@ struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 #define DISCO_TWIRL 6
 #define DISCO_BARBER_2 7
 #define DISCO_TWIRL_2 8
+#define RAIN 9
 
-int maxPatternId = 8;
-int rotationInMillseconds = 20000;
+int maxPatternId = 9;
+int rotationInMillseconds = 30000;
 
 // If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
 bool holdPattern = true;
@@ -289,6 +290,8 @@ void loop () {
   EVERY_N_MILLISECONDS(1000/30) {
     if (patternId == NIGHT_SPARKLES) {
       nightSparkles();
+    } else if (patternId == RAIN) {
+      rain();
     } else if (patternId == BEAUTIFUL_SPARKLES) {
       beautifulSparkles();
     } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
@@ -309,3 +312,34 @@ void loop () {
   show_at_max_brightness_for_power();
   delay(1000/60);
 }
+
+int counter = 0;
+int frameSize = 8;
+
+void rain() {
+  if (firstTimeRunningThroughPattern) {
+    for (int i = NUM_LEDS; i > 0; i--) {
+      int on = random8(100) > 80 ? 255 : 0;
+      leds[i] = CHSV(hue, 255, on);
+      counter++;
+      if (counter == 20) {
+        hue++;
+        counter = 0;
+      }
+    }
+  } else {
+    for (int i = NUM_LEDS; i > frameSize; i--) {
+      leds[i] = leds[i-frameSize];
+    }
+    for (int i = 0; i <= frameSize + 1; i++) {
+      int on = random8(100) > 80 ? 255 : 0;
+      leds[i] = CHSV(hue, 255, on);
+      counter++;
+      if (counter == 20) {
+        hue--;
+        counter = 0;
+      }
+    }
+  }
+}
+
