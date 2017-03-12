@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      if (location.host === 'socket.dev') document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
+    </script>
+  </head>
+  <body>
+    <h3>Ueno. sign controls</h3>
+    <p>Choose a lamp:</p>
+
+    <select id="sign-selector">
+      <option value="10.15.1.129">Ueno Sign</option>
+      <option value="10.0.1.22">Elliott Home</option>
+    </select>
+
+    <div id="light" class="disconnected"></div>
+
+    <p>Choose a pattern:</p>
+    <p>
+      <button class="pattern" id="button0" disabled>Randomize</button>
+      <button class="pattern" id="button1">Beautiful Sparkles</button>
+      <button class="pattern" id="button3">Night Sparkles</button>
+      <button class="pattern" id="button2">Dave</button>
+      <button class="pattern" id="button4">Worms</button>
+      <button class="pattern" id="button5">Disco 1</button>
+      <button class="pattern" id="button6">Disco 2</button>
+      <button class="pattern" id="button7">Disco 3</button>
+      <button class="pattern" id="button8">Disco 4</button>
+      <button class="pattern" id="button9">Rain</button>
+    </p>
+    <p>
+      Brightness:
+      <input type="range" id="brightness" min="10" max="255" />
+      <button class="pattern" id="brightnessLow">Low</button>
+      <button class="pattern" id="brightnessMedium">Medium</button>
+      <button class="pattern" id="brightnessHigh">High</button>
+    </p>
+
+    <p>
+      Speed:
+      <input id="speed" type="range" min="-100" max="-30" />
+    </p>
+
+    <p><i>Psssst - You gotta be on the <span id="wifi">UENO</span> wi-fi for this to work.</i></p>
+  </body>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+  <script type="text/javascript" src="simple.js"></script>
+</html>

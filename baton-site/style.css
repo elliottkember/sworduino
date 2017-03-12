@@ -1,0 +1,177 @@
+html {
+  font-family: 'Tisa Pro';
+  padding: 80px;
+}
+
+button {
+  padding: 4px 10px;
+}
+button:active {
+  color: white;
+}
+
+#light {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  position: relative;
+  top: 4px;
+  margin: 0 5px;
+  border-radius: 10px;
+  background: red;
+}
+
+p {
+  line-height: 2;
+}
+
+#light.connected {
+  background: green;
+}
+
+#light.connecting {
+  background: orange;
+}
+
+.frame {
+  display: flex;
+  flex-direction: row;
+  border-left: 2px solid #999;
+  width: 100%;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  border: 2px solid #999;
+  border-left: 0;
+  padding: 10px;
+}
+
+#mirror {
+  line-height: 10px;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  margin-top: 50px;
+  margin-bottom: 10px;
+}
+
+#sample {
+  transform: scale(9.5);
+}
+
+.p {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+#mirror b {
+  display: inline-flex;
+  width: 8px;
+  height: 8px;
+  margin: 0 1px;
+  border-radius: 50%;
+  background-color: #aaa;
+}
+
+.input {
+  padding: 10px;
+}
+
+.input > * {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+#wifi {
+  font-weight: bold;
+}
+
+// Akagi Pro
+@font-face {
+  font-family: 'Akagi Pro';
+  font-style: normal;
+  font-weight: 200;
+  src: url('assets/fonts/akagi-pro-light.eot');
+  src:
+    url('assets/fonts/akagi-pro-light.eot?#iefix') format('embedded-opentype'),
+    url('assets/fonts/akagi-pro-light.woff2') format('woff2'),
+    url('assets/fonts/akagi-pro-light.woff') format('woff'),
+    url('assets/fonts/akagi-pro-light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Akagi Pro';
+  font-style: normal;
+  font-weight: 300;
+  src: url('assets/fonts/akagi-pro-book.eot');
+  src:
+    url('assets/fonts/akagi-pro-book.eot?#iefix') format('embedded-opentype'),
+    url('assets/fonts/akagi-pro-book.woff2') format('woff2'),
+    url('assets/fonts/akagi-pro-book.woff') format('woff'),
+    url('assets/fonts/akagi-pro-book.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Akagi Pro';
+  font-style: normal;
+  font-weight: 500;
+  src: url('assets/fonts/akagi-pro-medium.eot');
+  src:
+    url('assets/fonts/akagi-pro-medium.eot?#iefix') format('embedded-opentype'),
+    url('assets/fonts/akagi-pro-medium.woff2') format('woff2'),
+    url('assets/fonts/akagi-pro-medium.woff') format('woff'),
+    url('assets/fonts/akagi-pro-medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Akagi Pro';
+  font-style: normal;
+  font-weight: 600;
+  src: url('assets/fonts/akagi-pro-semibold.eot');
+  src:
+    url('assets/fonts/akagi-pro-semibold.eot?#iefix') format('embedded-opentype'),
+    url('assets/fonts/akagi-pro-semibold.woff2') format('woff2'),
+    url('assets/fonts/akagi-pro-semibold.woff') format('woff'),
+    url('assets/fonts/akagi-pro-semibold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Akagi Pro';
+  font-style: normal;
+  font-weight: 700;
+  src: url('assets/fonts/akagi-pro-bold.eot');
+  src:
+    url('assets/fonts/akagi-pro-bold.eot?#iefix') format('embedded-opentype'),
+    url('assets/fonts/akagi-pro-bold.woff2') format('woff2'),
+    url('assets/fonts/akagi-pro-bold.woff') format('woff'),
+    url('assets/fonts/akagi-pro-bold.ttf') format('truetype');
+}
+
+// Tisa Pro
+@font-face {
+  font-family: 'Tisa Pro';
+  font-style: normal;
+  font-weight: 100;
+  src: url('assets/fonts/ff-tisa-web-pro-thin.eot');
+  src:
+    url('assets/fonts/ff-tisa-web-pro-thin.eot?#iefix') format('embedded-opentype'),
+    url('assets/fonts/ff-tisa-web-pro-thin.woff2') format('woff2'),
+    url('assets/fonts/ff-tisa-web-pro-thin.woff') format('woff'),
+    url('assets/fonts/ff-tisa-web-pro-thin.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Tisa Pro';
+  font-style: normal;
+  font-weight: 200;
+  src: url('assets/fonts/ff-tisa-web-pro-light.eot');
+  src:
+    url('assets/fonts/ff-tisa-web-pro-light.eot?#iefix') format('embedded-opentype'),
+    url('assets/fonts/ff-tisa-web-pro-light.woff2') format('woff2'),
+    url('assets/fonts/ff-tisa-web-pro-light.woff') format('woff'),
+    url('assets/fonts/ff-tisa-web-pro-light.ttf') format('truetype');
+}

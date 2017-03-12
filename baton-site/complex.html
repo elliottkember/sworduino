@@ -1,0 +1,39 @@
+<html>
+<head>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="frame">
+    <div class="item">
+      <video id="video" src="https://media.giphy.com/media/NEVT1WQFlHec8/giphy.mp4" controls="false" crossOrigin="" loop></video>
+    </div>
+    <div class="item" style="display: none;">
+      <canvas id="screen" width="0" height="0"></canvas>
+    </div>
+    <div class="item">
+      <canvas id="sample" width="9" height="30"></canvas>
+    </div>
+    <div class="item">
+      <div id="mirror"></div>
+      <button id="connect">Connect</button>
+      <button id="send">Send</button>
+      <button id="play">play/pause</button>
+      <button id="disconnect">Disconnect</button>
+    </div>
+  </div>
+  <div class="input">
+    Speed:
+    <select id="speed">
+      <option value="0.25">0.25x</option>
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+      <option value="3">3x</option>
+    </select>
+    Giphy:
+    <input type="text" value="NEVT1WQFlHec8" id="giphyId" /><button id="setGiphy">Ok</button>
+  </div>
+
+  </body>
+  <script type="text/javascript" src="index.js"></script>
+</html>
