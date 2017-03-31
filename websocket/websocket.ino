@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
@@ -17,6 +18,9 @@
 // WIFI
 const char* ssid = "";
 const char* password = "";
+
+// brightness
+uint8_t max_bright = 80;
 
 // Timers
 unsigned long render = 0;
@@ -46,13 +50,15 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t len) {
       Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
     } break;
 
-    case WSType_TEXT: {
-
+    case WStype_TEXT: {
       String command = (char*) payload;
       if (command == "status") {
         /**
          * Send status to client
          */
+
+        String command = (char*) payload;
+        StaticJsonBuffer<1024> jsonBuffer;
 
         JsonObject& root = jsonBuffer.createObject();
         root['brightness'] = max_bright;
@@ -121,6 +127,7 @@ void setup() {
 }
 
 void loop() {
+  FastLED.setBrightness(max_bright);
   webSocket.loop();
   if (millis() > render) {
     FastLED.show();
