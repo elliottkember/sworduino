@@ -1,5 +1,4 @@
 namespace NightSparkles {
-
   int hue = 0;
   int frameSize = CIRCUMFERENCE;
   uint8_t counter = 0;

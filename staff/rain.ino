@@ -1,5 +1,4 @@
 namespace Rain {
-
   int counter = 0;
   uint8_t hue = 1;
   int frameSize = CIRCUMFERENCE;
@@ -12,7 +11,7 @@ namespace Rain {
     }
   }
 
-  void draw() {
+  void draw() {    
     if (Global::firstTimeRunningThroughPattern) {
       for (int i = NUM_LEDS; i > 0; i--) {
         int on = random8(100) > 80 ? 255 : 0;
@@ -22,10 +21,14 @@ namespace Rain {
     } else {
       for (int i = NUM_LEDS; i > frameSize; i--) {
         Global::leds[i] = Global::leds[i-frameSize];
+        if (Global::leds[i].getAverageLight() > 0) {
+          Global::leds[i] = CHSV(lean * 255, 180, 255);
+        }
       }
       for (int i = 0; i <= frameSize + 1; i++) {
         int on = random8(100) > 80 ? 255 : 0;
-        Global::leds[i] = CHSV(hue, 255, on);
+//        Global::leds[i] = CHSV(hue, 255, on);
+        Global::leds[i] = CHSV(lean * 255, 180, on);
         count();
       }
     }

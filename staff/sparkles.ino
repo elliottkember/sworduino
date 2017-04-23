@@ -1,5 +1,4 @@
 namespace Sparkles {
-
   int numberOfSparkles = 0;
   int hue = 0;
 

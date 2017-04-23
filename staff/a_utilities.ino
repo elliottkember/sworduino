@@ -1,5 +1,4 @@
 namespace UpAndDownBy {
-
   bool increasing = true;
   // TODO increasing and numberOfSparkles should probably be passed by reference here!
   int go(int value, int difference, int max, int min) {

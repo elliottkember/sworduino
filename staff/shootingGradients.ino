@@ -1,5 +1,4 @@
 namespace ShootingGradients {
-
   uint8_t numberOfWorms = 4;
   uint8_t wormsFadeRate = 80; // Very low value = longer trails.
   uint8_t wormsHueIncrement = 2; // Incremental change in hue between each dot.
