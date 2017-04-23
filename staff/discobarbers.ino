@@ -10,6 +10,7 @@ namespace DiscoBarbers {
   void discoBarber1() {
     frequency = 5;
     phase += 20;
+    
     // Special CPP11 closure syntax
     Global::printPixels([](int k) -> CRGB {
       int _brightness = qsubd(cubicwave8((k * frequency) + phase), cutoff);

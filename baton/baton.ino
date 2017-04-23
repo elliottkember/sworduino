@@ -48,7 +48,7 @@ void setup() {
   filter.begin(100);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(max_bright);
-  set_max_power_in_volts_and_milliamps(5, 2000);
+  set_max_power_in_volts_and_milliamps(5, 1000);
   randomSeed(analogRead(0));
   delay(50);
 }

@@ -1,12 +1,3 @@
-#define FASTLED_ALLOW_INTERRUPTS 0
-
-#include <Arduino.h>
-#include <ArduinoJson.h>
-#include <ESP8266mDNS.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266WiFiMulti.h>
-#include <WebSocketsServer.h>
-#include <Hash.h>
 #include <FastLED.h>
 
 #define qsubd(x, b)  ((x>b)?255:0)  // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
@@ -36,84 +27,11 @@ uint8_t max_bright = 255;     // Overall brightness definition. It can be change
 uint16_t frameDelay = 30;
 
 int maxPatternId = 9;
-int rotationInMillseconds = 120000;
+int rotationInMillseconds = 600000;
 
 // If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
-bool holdPattern = true;
+bool holdPattern = false;
 int patternId = BEAUTIFUL_SPARKLES;
-
-// WIFI
-const char* ssid = "UENO";
-const char* password = "haraldur";
-
-ESP8266WiFiMulti WiFiMulti;
-WebSocketsServer webSocket = WebSocketsServer(81);
-/**
- * Websocket event
- *
- * @param {num} Client number
- * @param {type} Command type (disconnect, connect, read)
- * @param {payload} Received payload
- * @param {len} Payload size
- */
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t len) {
-  switch (type) {
-
-    case WStype_DISCONNECTED: {
-      Serial.printf("[%u] Disconnected!\n", num);
-      webSocket.begin();
-    } break;
-
-    case WStype_CONNECTED: {
-      IPAddress ip = webSocket.remoteIP(num);
-      Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
-    } break;
-
-    case WStype_TEXT: {
-      String command = (char*) payload;
-      Serial.println(command);
-
-      StaticJsonBuffer<1024> jsonBuffer;
-      JsonObject& root = jsonBuffer.parseObject(command);
-
-      if (root["pattern"]) {
-        firstTimeRunningThroughPattern = true;
-        patternId = root["pattern"];
-      }
-
-      if (root["brightness"]) {
-        max_bright = root["brightness"];
-      }
-
-      if (root["speed"]) {
-        frameDelay = root["speed"];
-      }
-
-      String message = "{\"speed\": " + (String)frameDelay + ", \"brightness\": " + (String)max_bright + ", \"pattern\": " + (String)patternId + "}";
-      webSocket.sendTXT(num, message);
-    }
-  }
-}
-
-void setupWiFi() {
-  WiFiMulti.addAP(ssid, password);
-
-  Serial.println();
-  Serial.println();
-  Serial.print("Wait for WiFi");
-
-  while (WiFiMulti.run() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-
-  delay(500);
-}
 
 // Set up LEDs, fade them all to black.
 void setup() {
@@ -123,13 +41,6 @@ void setup() {
   set_max_power_in_volts_and_milliamps(5, 2000);
   randomSeed(analogRead(0));
   delay(50);
-
-    // Setup WiFi
-  setupWiFi();
-
-  // Websocket
-  webSocket.begin();
-  webSocket.onEvent(webSocketEvent);
 }
 
 uint8_t offset = 0;
@@ -178,6 +89,37 @@ int     discoBarberPhase = 0;
 uint8_t discoBarberFrequency = 10;
 uint8_t discoBarberCutoff = 30;
 uint8_t discoBarberSaturation = 240;
+
+void discoBarber() {
+  if (patternId == DISCO_BARBER_1) {
+    discoBarberFrequency = 5;
+    discoBarberPhase += 24;
+  } else {
+    discoBarberFrequency = 4;
+    discoBarberPhase += 10;
+  }
+
+  hue = hue + 1;
+
+  for (int k = 0; k < NUM_LEDS - 1; k++) {
+    // qsub sets a minimum value called discoBarberCutoff. If < discoBarberCutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    int _brightness = qsubd(cubicwave8((k * discoBarberFrequency) + discoBarberPhase), discoBarberCutoff);
+    leds[k] = CHSV(0, 0, 0);                                        // First set a background colour, but fully saturated.
+
+    // Sparkles!
+    if (random(1000) > 990) {
+      leds[k] = CHSV(255, 0, 255);
+    }
+
+    if (patternId == DISCO_BARBER_1) {
+      // original disco barber 1
+      // leds[k] += CHSV(hue+k/5, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
+      leds[k] += CHSV(hue * 10 + k / 2, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
+    } else {
+      leds[k] += CHSV(hue * -20 + k / 2, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
+    }
+  }
+}
 
 void barbershop() {
 //  hue = hue + 1;
@@ -254,41 +196,6 @@ void worms() {
   }
 }
 
-//int     discoBarberPhase = 0;
-//uint8_t discoBarberFrequency = 3;
-//uint8_t discoBarberCutoff = 120;
-//uint8_t discoBarberSaturation = 240;
-
-void discoBarber() {
-  if (patternId == DISCO_BARBER_1) {
-    discoBarberFrequency = 5;
-    discoBarberPhase += 24;
-  } else {
-    discoBarberFrequency = 4;
-    discoBarberPhase += 10;
-  }
-
-  hue = hue + 1;
-
-  for (int k = 0; k < NUM_LEDS - 1; k++) {
-    // qsub sets a minimum value called discoBarberCutoff. If < discoBarberCutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
-    int _brightness = qsubd(cubicwave8((k * discoBarberFrequency) + discoBarberPhase), discoBarberCutoff);
-    leds[k] = CHSV(0, 0, 0);                                        // First set a background colour, but fully saturated.
-
-    // Sparkles!
-    if (random(1000) > 990) {
-      leds[k] = CHSV(255, 0, 255);
-    }
-
-    if (patternId == DISCO_BARBER_1) {
-      // original disco barber 1
-      // leds[k] += CHSV(hue+k/5, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
-      leds[k] += CHSV(hue * 10 + k / 2, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
-    } else {
-      leds[k] += CHSV(hue * -20 + k / 2, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
-    }
-  }
-}
 
 int thisphase = 0;                                            // Phase change value gets calculated.
 bool fadeUp = 0;
@@ -360,53 +267,8 @@ void discoTwirl2() {
   }
 }
 
-void draw() {
-  if (patternId == NIGHT_SPARKLES) {
-    nightSparkles();
-  } else if (patternId == RAIN) {
-    rain();
-  } else if (patternId == BEAUTIFUL_SPARKLES) {
-    beautifulSparkles();
-  } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
-    discoBarber();
-  } else if (patternId == WORMS) {
-    worms();
-  } else if (patternId == DISCO_TWIRL) {
-    discoTwirl();
-  } else if (patternId == DISCO_TWIRL_2) {
-    discoTwirl2();
-  } else if (patternId == DAVE) {
-    dave();
-  }
-    
-  firstTimeRunningThroughPattern = false;
-}
-
-void loop () {
-  webSocket.loop();
-  if (!holdPattern) {
-    EVERY_N_MILLISECONDS(rotationInMillseconds) {
-      firstTimeRunningThroughPattern = true;
-      patternId += 1;
-      if (patternId > maxPatternId) {
-        patternId = 1;
-      }
-    }
-  }
-
-    bool printIt = millis() > previousMillis + frameDelay;
-    if (printIt) {
-      draw();
-      previousMillis = millis();
-    }
-
-  FastLED.setBrightness(max_bright);
-  FastLED.show();
-}
-
 int counter = 0;
 int frameSize = 1;
-
 void rain() {
   if (firstTimeRunningThroughPattern) {
     for (int i = NUM_LEDS; i > 0; i--) {
@@ -432,4 +294,47 @@ void rain() {
       }
     }
   }
+}
+
+void draw() {
+  if (patternId == NIGHT_SPARKLES) {
+    nightSparkles();
+  } else if (patternId == RAIN) {
+    rain();
+  } else if (patternId == BEAUTIFUL_SPARKLES) {
+    beautifulSparkles();
+  } else if (patternId == DISCO_BARBER_1 || patternId == DISCO_BARBER_2) {
+    discoBarber();
+  } else if (patternId == WORMS) {
+    worms();
+  } else if (patternId == DISCO_TWIRL) {
+    discoTwirl();
+  } else if (patternId == DISCO_TWIRL_2) {
+    discoTwirl2();
+  } else if (patternId == DAVE) {
+    dave();
+  }
+    
+  firstTimeRunningThroughPattern = false;
+}
+
+void loop () {
+  if (!holdPattern) {
+    EVERY_N_MILLISECONDS(rotationInMillseconds) {
+      firstTimeRunningThroughPattern = true;
+      patternId += 1;
+      if (patternId > maxPatternId) {
+        patternId = 1;
+      }
+    }
+  }
+
+    bool printIt = millis() > previousMillis + frameDelay;
+    if (printIt) {
+      draw();
+      previousMillis = millis();
+    }
+
+  FastLED.setBrightness(max_bright);
+  FastLED.show();
 }
