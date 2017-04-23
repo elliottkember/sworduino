@@ -36,7 +36,7 @@ uint8_t max_bright = 255;     // Overall brightness definition. It can be change
 uint16_t frameDelay = 30;
 
 int maxPatternId = 9;
-int rotationInMillseconds = 120000;
+int rotationInMinutes = 10;
 
 // If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
 bool holdPattern = true;
@@ -385,7 +385,7 @@ void draw() {
 void loop () {
   webSocket.loop();
   if (!holdPattern) {
-    EVERY_N_MILLISECONDS(rotationInMillseconds) {
+    EVERY_N_MINUTES(rotationInMinutes) {
       firstTimeRunningThroughPattern = true;
       patternId += 1;
       if (patternId > maxPatternId) {
