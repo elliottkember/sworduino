@@ -1,15 +1,15 @@
 #include "FastLED.h"
 #define qsubd(x, b)  ((x>b)?255:0)  // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
 #define qsuba(x, b)  ((x>b)?x-b:0)  // Analog Unsigned subtraction macro. if result <0, then => 0
-#define LED_DT 7              // Data pin to connect to the strip.
-#define COLOR_ORDER GRB       // Are they RGB, GRB or what??
-#define LED_TYPE WS2812B      // Don't forget to change LEDS.addLeds
+
 uint8_t max_bright = 255;     // Overall brightness definition. It can be changed on the fly.
-unsigned long previousMillis; // Store last time the strip was updated.
+
 int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
-
-#define NUM_LEDS 300         // Number of LED's.
+int fps = 30;
+int power_in_milliamps = 7000;
+  
+#define NUM_LEDS 1500         // Number of LED's.
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 
 #define BEAUTIFUL_SPARKLES 1
@@ -23,22 +23,26 @@ struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 #define RAIN 9
 
 int maxPatternId = 9;
-int rotationInMillseconds = 30000;
+int rotationInSeconds = 5;
 
 // If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
 bool holdPattern = true;
-int patternId = BEAUTIFUL_SPARKLES;
-/*
-bool holdPattern = true;
-int patternId = DISCO_TWIRL;
-*/
+int patternId = WORMS;
 
 // Set up LEDs, fade them all to black.
 void setup() {
   Serial.begin(57600);
-  LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
+
+  // WS2812
+  //  LEDS.addLeds<WS2812B, 7, GRB>(leds, NUM_LEDS);
+
+  // APA102
+  FastLED.addLeds<APA102, BGR>(leds, NUM_LEDS);
+  pinMode(7, OUTPUT);
+  digitalWrite(7, HIGH);  // enable access to LEDs
+  
   FastLED.setBrightness(max_bright);
-  set_max_power_in_volts_and_milliamps(5, 10000);
+  set_max_power_in_volts_and_milliamps(5, power_in_milliamps);
   randomSeed(analogRead(0));
   delay(50);
   // Make the whole stick black on startup (helps with restarts).
@@ -137,17 +141,23 @@ void nightSparkles() {
     leds[random16(NUM_LEDS)] = CHSV(hue, 200, 20);
   }
   hue += 1;
-  delay(6);
+//  delay(6);
 }
 
 void beautifulSparkles() {
   fadeToBlackBy(leds, NUM_LEDS, 150);
-  numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
-  for (int i = 0; i < numberOfSparkles * 3; i++) {
+  EVERY_N_MILLISECONDS(100) {
+    numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
+  }
+
+  for (int i = 0; i < numberOfSparkles; i++) {
     int pos = random16(NUM_LEDS);
     leds[pos] = CHSV(hue + (pos / 7), 240, 255);
   }
-  hue += 10;
+  
+  EVERY_N_MILLISECONDS(1000) {
+    hue += 10;
+  }
   delay(10);
 }
 
@@ -278,7 +288,7 @@ void discoTwirl2() {
 
 void loop () {
   if (!holdPattern) {
-    EVERY_N_MILLISECONDS(rotationInMillseconds) {
+    EVERY_N_SECONDS(rotationInSeconds) {
       firstTimeRunningThroughPattern = true;
       patternId += 1;
       if (patternId > maxPatternId) {
@@ -287,7 +297,9 @@ void loop () {
     }
   }
 
-  EVERY_N_MILLISECONDS(1000/30) {
+  fadeToBlackBy(leds, NUM_LEDS, 10);
+  
+//  EVERY_N_MILLISECONDS(1000/30) {
     if (patternId == NIGHT_SPARKLES) {
       nightSparkles();
     } else if (patternId == RAIN) {
@@ -305,12 +317,12 @@ void loop () {
     } else if (patternId == DAVE) {
       dave();
     }
-  }
+//  }
 
   firstTimeRunningThroughPattern = false;
 
   show_at_max_brightness_for_power();
-  delay(1000/60);
+  delay(1000/fps);
 }
 
 int counter = 0;
