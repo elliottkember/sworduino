@@ -17,8 +17,6 @@ void setupPropShield() {
   filter.begin(100);
 }
 
-struct CRGB motions[100];
-
 void updateMotion() {
   // get and print uncalibrated data
   if (imu.available()) {
@@ -29,9 +27,9 @@ void updateMotion() {
     filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
 
     // print the heading, pitch and roll
-    roll = filter.getRoll();
-    pitch = filter.getPitch();
-    heading = filter.getYaw();
+//    roll = filter.getRoll();
+//    pitch = filter.getPitch();
+//    heading = filter.getYaw();
 
     lean = abs((mx + my) / 80);
   }
