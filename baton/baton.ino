@@ -1,15 +1,3 @@
-#include <NXPMotionSense.h>
-#include <Wire.h>
-#include <EEPROM.h>
-//#include <util/crc16.h>
-
-NXPMotionSense imu;
-NXPSensorFusion filter;
-float ax, ay, az;
-float gx, gy, gz;
-float mx, my, mz;
-float roll, pitch, heading;
-
 #include "FastLED.h"
 #define qsubd(x, b)  ((x>b)?255:0)  // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
 #define qsuba(x, b)  ((x>b)?x-b:0)  // Analog Unsigned subtraction macro. if result <0, then => 0
@@ -35,7 +23,7 @@ struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 #define RAIN 9
 
 int maxPatternId = 9;
-int rotationInMillseconds = 30000;
+int rotationInSeconds = 30;
 
 // If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
 bool holdPattern = true;
@@ -44,8 +32,7 @@ int patternId = RAIN;
 // Set up LEDs, fade them all to black.
 void setup() {
   Serial.begin(57600);
-  imu.begin();
-  filter.begin(100);
+  setupMotion();
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(max_bright);
   set_max_power_in_volts_and_milliamps(5, 1000);
@@ -57,42 +44,24 @@ uint8_t offset = 0;
 int ms = 0;
 
 void dave() {
-
-  for (int k=0; k<NUM_LEDS-1; k++) {
+  for (int k = 0; k < NUM_LEDS - 1; k++) {
     uint8_t k8 = k;
-    uint8_t hue = (k/15 * 255) + (offset*5);
+    uint8_t hue = (k / 15 * 255) + (offset * 5);
     uint8_t saturation = rand() % 255 > 252 ? 0 : 255; //NUM_LEDS - (k+offset*10);
     uint8_t value = k8 % 14 == offset % 14 ? 200 : 40; //NUM_LEDS- (k+offset*10);
-    if(saturation == 0){
+    if (saturation == 0) {
       value = 255;
     }
 
     leds[k] = CHSV(hue, saturation, value);
   }
 
-  EVERY_N_MILLISECONDS(1000/24){
+  EVERY_N_MILLISECONDS(1000 / 24) {
     ms++;
-    if(ms % 3 == 0){
+    if (ms % 3 == 0) {
       offset++;
     }
   }
-}
-
-
-void verticalLines() {
-  struct CRGB colors[8];
-
-  //  for (int i = 0; i < numberOfSparkles * 4; i++) {
-  for (int i = 0; i < 8; i++) {
-    colors[i] = CHSV(offset, ((256/8) * i) + offset, ((256/8) * i) + offset);
-  }
-
-  for (int k=0; k<NUM_LEDS-1; k++) {
-    leds[k] = colors[k % 8];
-  }
-
-  offset += 20;
-  // @todo progress colours in some fashion.
 }
 
 int     discoBarberPhase = 0;
@@ -133,8 +102,9 @@ int upAndDownBy(int value, int difference) {
 
 void nightSparkles() {
   fadeToBlackBy(leds, NUM_LEDS, 180);
-//  Serial.println(ax);
-  numberOfSparkles = abs(ax) * 12; // upAndDownBy(numberOfSparkles, 1);
+  // MOTION
+  //  numberOfSparkles = abs(ax) * 12;
+  numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
   for (int i = 0; i < numberOfSparkles * 4; i++) {
     int pos = random16(NUM_LEDS);
     leds[pos] = CHSV(hue, 180, 255);
@@ -142,16 +112,13 @@ void nightSparkles() {
   for (int i = 0; i < numberOfSparkles; i++) {
     leds[random16(NUM_LEDS)] = CHSV(hue, 200, 20);
   }
-//  hue += 1;
-hue = (heading / 360) * 255;
+
+  hue += 1;
   delay(6);
 }
 
 void beautifulSparkles() {
   fadeToBlackBy(leds, NUM_LEDS, 150);
-
-  // Serial.println(heading);
-  //heading / 360 * 4.0;
   numberOfSparkles = upAndDownBy(numberOfSparkles, 1);
   for (int i = 0; i < numberOfSparkles * 3; i++) {
     int pos = random16(NUM_LEDS);
@@ -180,15 +147,11 @@ void worms() {
   }
 }
 
-//int     discoBarberPhase = 0;
-//uint8_t discoBarberFrequency = 3;
-//uint8_t discoBarberCutoff = 120;
-//uint8_t discoBarberSaturation = 240;
-
 void discoBarber() {
   if (patternId == DISCO_BARBER_1) {
     discoBarberFrequency = 5;
-    discoBarberPhase += ay * 48;
+    discoBarberPhase += 2; // TODO: Verify?
+    // discoBarberPhase += ay * 48;
   } else {
     discoBarberFrequency = 4;
     discoBarberPhase += 10;
@@ -207,9 +170,8 @@ void discoBarber() {
     }
 
     if (patternId == DISCO_BARBER_1) {
-      // original disco barber 1
-      // leds[k] += CHSV(hue+k/5, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
-      leds[k] += CHSV(hue * 10 + k / ax, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
+      leds[k] += CHSV(hue+k/5, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
+//      leds[k] += CHSV(hue * 10 + k / ax, discoBarberSaturation, _brightness);                             // Then assign a hue to any that are bright enough.
     } else {
       leds[k] += CHSV(hue * -20 + k / 2, discoBarberSaturation, _brightness);                       // Then assign a hue to any that are bright enough.
     }
@@ -228,7 +190,6 @@ uint8_t thiscutoff = 200;                                     // You can change 
 uint8_t fade = 200;
 
 void discoTwirl() {
-
   if (firstTimeRunningThroughPattern) {
     thishue = 0;                                           // You can change the starting hue value for the first wave.
     thisrot = 18;                                          // You can change how quickly the hue rotates for this wave. Currently 0.
@@ -248,10 +209,10 @@ void discoTwirl() {
     }
   }
 
-  if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
+  if (thisdir == 0) thisphase += thisspeed; else thisphase -= thisspeed;      // You can change direction and speed individually.
   fadeToBlackBy(leds, NUM_LEDS, fade);
-  for (int k=0; k<NUM_LEDS-1; k++) {
-    int thisbright = cubicwave8((k*-allfreq)+thisphase);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+  for (int k = 0; k < NUM_LEDS - 1; k++) {
+    int thisbright = cubicwave8((k * -allfreq) + thisphase);  // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
     leds[k] += CHSV(thishue + k + thisphase / 5, 200, thisbright);                               // Assigning hues and brightness to the led array.
   }
 }
@@ -278,10 +239,10 @@ void discoTwirl2() {
     thiscutoff = 200;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
   }
 
-  if (thisdir == 0) thisphase+=thisspeed; else thisphase-=thisspeed;          // You can change direction and speed individually.
+  if (thisdir == 0) thisphase += thisspeed; else thisphase -= thisspeed;      // You can change direction and speed individually.
   fadeToBlackBy(leds, NUM_LEDS, fade);
-  for (int k=0; k<NUM_LEDS-1; k++) {
-    int thisbright = cubicwave8((k*-allfreq)+thisphase);      // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+  for (int k = 0; k < NUM_LEDS - 1; k++) {
+    int thisbright = cubicwave8((k * -allfreq) + thisphase);  // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
     leds[k] += CHSV(thishue + k + thisphase / 5, allsat, thisbright);                               // Assigning hues and brightness to the led array.  }
   }
 }
@@ -290,22 +251,6 @@ int counter = 0;
 int frameSize = 8;
 
 void rain() {
-
-  double x = ax; //mx / 45;
-  double y = ay; //my / 45;
-  double z = az; // (mz + 35) / 35;
-
-//  Serial.print(x);
-//  Serial.print(y);
-  Serial.print(mx);
-  Serial.print(" ");
-  Serial.print(my);
-  Serial.print(" ");
-  Serial.println(mz);
-
-  double lean = (x + y) / 2;
-  Serial.println(lean);
-
   if (firstTimeRunningThroughPattern) {
     for (int i = NUM_LEDS; i > 0; i--) {
       int on = random8(100) > 80 ? 255 : 0;
@@ -313,41 +258,20 @@ void rain() {
     }
   } else {
     for (int i = NUM_LEDS; i > frameSize; i--) {
-      leds[i] = leds[i-frameSize];
+      leds[i] = leds[i - frameSize];
     }
     for (int i = 0; i <= frameSize + 1; i++) {
-      int on = random8(100) > (70 + (y * 20)) ? 255 : 0;
-//      int on = random16(1500) > abs(mz) ? 255 : 0;
-      leds[i] = CHSV(lean * 255, 180, on);
+      // TODO: Verify this randomness
+      int on = random8(100) > 80;
     }
   }
 }
 
 void loop () {
-
-   // get and print uncalibrated data
-   if (imu.available()) {
-    // Read the motion sensors
-    imu.readMotionSensor(ax, ay, az, gx, gy, gz, mx, my, mz);
-
-    // Update the SensorFusion filter
-    filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
-
-    // print the heading, pitch and roll
-    roll = filter.getRoll();
-    pitch = filter.getPitch();
-    heading = filter.getYaw();
-
-//    Serial.print("Orientation: ");
-//    Serial.print(heading);
-//    Serial.print(" ");
-//    Serial.print(pitch);
-//    Serial.print(" ");
-//    Serial.println(roll);
-  }
+  readMotionIfAvailable();
 
   if (!holdPattern) {
-    EVERY_N_MILLISECONDS(rotationInMillseconds) {
+    EVERY_N_SECONDS(rotationInSeconds) {
       firstTimeRunningThroughPattern = true;
       patternId += 1;
       if (patternId > maxPatternId) {
@@ -356,7 +280,7 @@ void loop () {
     }
   }
 
-  EVERY_N_MILLISECONDS(1000/60) {
+  EVERY_N_MILLISECONDS(1000 / 60) {
     if (patternId == NIGHT_SPARKLES) {
       nightSparkles();
     } else if (patternId == RAIN) {
