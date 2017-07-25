@@ -6,7 +6,7 @@
 uint8_t MAX_BRIGHT = 255;     // Overall brightness definition. It can be changed on the fly.
 uint8_t hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
-#define NUM_LEDS 1500         // Number of LED's.
+#define NUM_LEDS 300         // Number of LED's.
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 
 void setup() {

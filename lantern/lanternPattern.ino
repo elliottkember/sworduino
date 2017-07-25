@@ -1,4 +1,3 @@
-
 int numberOfSparkles = 1;
 bool increasing = true;
 
@@ -37,7 +36,7 @@ void lanternPattern() {
     }
   }
 
-  EVERY_N_MILLISECONDS(2000) {
+  EVERY_N_MILLISECONDS(5000) {
     snakes[snake] = random(7);
     snake++;
     if (snake >= SNAKES_COUNT) snake = 0;
@@ -49,13 +48,11 @@ void lanternPattern() {
   for (int i = 0; i < numberOfSparkles; i++) {
     int pos = random16(NUM_LEDS);
     if (!leds[pos]) {
-      leds[pos] = CHSV(hue + (pos / 15), 240, 255);
+      leds[pos] = CHSV(hue + (pos / 15), 240, 128);
     }
   }
   
   EVERY_N_MILLISECONDS(100) {
     hue += 1;
   }
-  
-//  delay(8);
 }
