@@ -1,14 +1,14 @@
 void (*patterns[])() = {
 //  solid,
-//  beautifulSparkles,
-//  discoBarber1,
-//  discoBarber2,
-//  rain,
-//  sparkles,
+  beautifulSparkles,
+  discoBarber1,
+  discoBarber2,
+  rain,
+  sparkles,
   dave,
-//  shootingGradients,
-//  discoTwirl,
-//  discoTwirl2,
+  shootingGradients,
+  discoTwirl,
+  discoTwirl2,
 };
 
 int patternId = 0;
