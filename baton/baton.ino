@@ -9,7 +9,7 @@ bool firstTimeRunningThroughPattern = true;
 int fps = 30;
 int power_in_milliamps = 7000;
   
-#define NUM_LEDS 1500         // Number of LED's.
+#define NUM_LEDS 300         // Number of LED's.
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 
 #define BEAUTIFUL_SPARKLES 1
@@ -23,21 +23,21 @@ struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
 #define RAIN 9
 
 int maxPatternId = 9;
-int rotationInSeconds = 5;
+int rotationInSeconds = 20;
 
 // If we're testing one pattern, use holdPattern as true and the patternId as the starting pattern.
-bool holdPattern = true;
-int patternId = WORMS;
+bool holdPattern = false;
+int patternId = BEAUTIFUL_SPARKLES;
 
 // Set up LEDs, fade them all to black.
 void setup() {
   Serial.begin(57600);
 
   // WS2812
-  //  LEDS.addLeds<WS2812B, 7, GRB>(leds, NUM_LEDS);
+    LEDS.addLeds<WS2812B, 7, GRB>(leds, NUM_LEDS);
 
   // APA102
-  FastLED.addLeds<APA102, BGR>(leds, NUM_LEDS);
+//  FastLED.addLeds<APA102, BGR>(leds, NUM_LEDS);
   pinMode(7, OUTPUT);
   digitalWrite(7, HIGH);  // enable access to LEDs
   
