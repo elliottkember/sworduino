@@ -3,7 +3,7 @@
 //March 4,2013
 //Version 1.0 adapted for OctoWS2811Lib (tested, working...)
 
-#define BRIGHTNESS_SCALE 0.8
+float brightnessScale = 0.8;
 #include <OctoWS2811.h>
 
 //OctoWS2811 Defn. Stuff
@@ -46,50 +46,69 @@ uint8_t const exp_gamma[256] PROGMEM =
 227,229,232,234,236,239,241,244,246,249,251,253,254,255
 };
 
+bool lastSwitchPosition;
 
 void setup()
 {
+  Serial.begin(57600);
   pinMode(13, OUTPUT);
+  pinMode(0, INPUT_PULLUP);
   leds.begin();
   leds.show();
+  delay(100);
+}
+
+unsigned long frameCount=25500;  // arbitrary seed to calculate the three time displacement variables t,t2,t3
+
+void checkSwitch() {
+  bool off = digitalRead(0);
+  if (off && brightnessScale > 0) {
+    brightnessScale -= 0.01;
+  } else if (!off && brightnessScale < 0.8) {
+    brightnessScale += 0.01;
+  }
+  if (!off && lastSwitchPosition == true) {
+    // Do something?
+  }
+  lastSwitchPosition = off;
 }
 
 
-void loop()
-{
-  unsigned long frameCount=25500;  // arbitrary seed to calculate the three time displacement variables t,t2,t3
-  while(1) {
-    frameCount++ ; 
-    uint16_t t = fastCosineCalc((42 * frameCount)/100);  //time displacement - fiddle with these til it looks good...
-    uint16_t t2 = fastCosineCalc((35 * frameCount)/100); 
-    uint16_t t3 = fastCosineCalc((38 * frameCount)/100);
+void loop() {
+  checkSwitch();
+  
+  frameCount++;
+  uint16_t t = fastCosineCalc((42 * frameCount)/100);  //time displacement - fiddle with these til it looks good...
+  uint16_t t2 = fastCosineCalc((35 * frameCount)/100); 
+  uint16_t t3 = fastCosineCalc((38 * frameCount)/100);
 
-    for (uint8_t y = 0; y < ROWS_LEDs; y++) {
-      int left2Right, pixelIndex;
-      if (((y % (ROWS_LEDs/8)) & 1) == 0) {
-        left2Right = 1;
-        pixelIndex = y * COLS_LEDs;
-      } else {
-        left2Right = -1;
-        pixelIndex = (y + 1) * COLS_LEDs - 1;
-      }
-      for (uint8_t x = 0; x < COLS_LEDs ; x++) {
-        //Calculate 3 seperate plasma waves, one for each color channel
-        uint8_t r = fastCosineCalc(((x << 3) + (t >> 1) + fastCosineCalc((t2 + (y << 3))))) * BRIGHTNESS_SCALE;
-        uint8_t g = fastCosineCalc(((y << 3) + t + fastCosineCalc(((t3 >> 2) + (x << 3))))) * BRIGHTNESS_SCALE;
-        uint8_t b = fastCosineCalc(((y << 3) + t2 + fastCosineCalc((t + x + (g >> 2))))) * BRIGHTNESS_SCALE;
-        //uncomment the following to enable gamma correction
-        //r=pgm_read_byte_near(exp_gamma+r);  
-        //g=pgm_read_byte_near(exp_gamma+g);
-        //b=pgm_read_byte_near(exp_gamma+b);
-        leds.setPixel(pixelIndex, ((r << 16) | (g << 8) | b));
-	pixelIndex += left2Right;
-      }
+  for (uint8_t y = 0; y < ROWS_LEDs; y++) {
+    int left2Right, pixelIndex;
+    if (((y % (ROWS_LEDs/8)) & 1) == 0) {
+      left2Right = 1;
+      pixelIndex = y * COLS_LEDs;
+    } else {
+      left2Right = -1;
+      pixelIndex = (y + 1) * COLS_LEDs - 1;
     }
-    digitalWrite(13, HIGH);
-    leds.show();  // not sure if this function is needed  to update each frame
-    digitalWrite(13, LOW);
+    for (uint8_t x = 0; x < COLS_LEDs ; x++) {
+      //Calculate 3 seperate plasma waves, one for each color channel
+      
+      uint8_t r = fastCosineCalc(((x << 3) + (t >> 1) + fastCosineCalc((t2 + (y << 3))))) * brightnessScale;
+      uint8_t g = fastCosineCalc(((y << 3) + t + fastCosineCalc(((t3 >> 2) + (x << 3))))) * brightnessScale;
+      uint8_t b = fastCosineCalc(((y << 3) + t2 + fastCosineCalc((t + x + (g >> 2))))) * brightnessScale;
+      
+      //uncomment the following to enable gamma correction
+      r = pgm_read_byte_near(exp_gamma+r);  
+      g = pgm_read_byte_near(exp_gamma+g);
+      b = pgm_read_byte_near(exp_gamma+b);
+      
+      leds.setPixel(pixelIndex, ((r << 16) | (g << 8) | b));
+      pixelIndex += left2Right;
+    }
   }
+  
+  leds.show();  // not sure if this function is needed  to update each frame
 }
 
 
