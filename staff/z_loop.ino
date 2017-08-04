@@ -19,18 +19,18 @@ void setup() {
   Serial.begin(57600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(Global::leds, NUM_LEDS);
   set_max_power_in_volts_and_milliamps(VOLTS, MAX_CURRENT_IN_MA);
-  setupPropShield();
+  // setupPropShield();
   // setupWifi();
-  
+
   delay(100);
 }
 
 void loop () {
   FastLED.setBrightness(Global::max_bright);
   Global::firstTimeRunningThroughPattern = true;
-  uint endTime = millis() + ROTATION_IN_MS;
+  unsigned int endTime = millis() + ROTATION_IN_MS;
   while (millis() < endTime) {
-    updateMotion();
+    // updateMotion();
     patterns[Global::patternId]();
     Global::firstTimeRunningThroughPattern = false;
     show_at_max_brightness_for_power();

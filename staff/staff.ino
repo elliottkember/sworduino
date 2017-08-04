@@ -5,7 +5,7 @@ namespace Global {
   struct CRGB leds[NUM_LEDS];
   bool firstTimeRunningThroughPattern = false;
   int hue = 50;
-  uint8_t max_bright = 220;
+  uint8_t max_bright = 250;
   uint16_t frameDelay = 1; // not actually used yet
   int patternId = 0;
 

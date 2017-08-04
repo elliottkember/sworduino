@@ -1,26 +1,8 @@
 int numberOfSparkles = 0;
-bool increasing = true;
+
 int snakeDelay = 500;
 
-
 namespace Lantern {
-
-  int curve(int value, int difference, int maximum) {
-    if (value < maximum && increasing) {
-      value += difference;
-    } else if (value > 1) {
-      value -= difference;
-      increasing = false;
-    } else {
-      increasing = true;
-      value += difference;
-    }
-    return value;
-  }
-
-  int upAndDownBy(int value, int difference) {
-    return curve(value, difference, 20);
-  }
 
   #define SNAKES_COUNT 20
   uint16_t snakes[SNAKES_COUNT];
@@ -38,7 +20,7 @@ namespace Lantern {
           if (snakes[i] >= NUM_LEDS) snakes[i] = 0;
         }
       }
-      numberOfSparkles = curve(numberOfSparkles, 1, NUM_LEDS * 0.01);
+      numberOfSparkles = upAndDownBy(numberOfSparkles, 1, NUM_LEDS * 0.01, 0);
     }
 
     EVERY_N_MILLISECONDS(snakeDelay) {
