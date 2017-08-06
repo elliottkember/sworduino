@@ -13,17 +13,13 @@
 #define fps 30
 
 namespace Global {
-  struct CRGB leds[NUM_LEDS];
-  bool firstTimeRunningThroughPattern = true;
-  uint8_t max_bright = 250;
-  uint16_t frameDelay = 1; // not actually used yet
   int patternId = 0;
+  bool firstTimeRunningThroughPattern = true;
+  struct CRGB leds[NUM_LEDS];
 
   void nextPattern(int maxPatternId) {
-    Global::firstTimeRunningThroughPattern = true;
-    if (++Global::patternId == maxPatternId) {
-      Global::patternId = 0;
-    }
+    firstTimeRunningThroughPattern = true;
+    if (++patternId == maxPatternId) patternId = 0;
   }
 }
 
@@ -32,7 +28,7 @@ void setup() {
   Serial.begin(57600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(Global::leds, NUM_LEDS);
   set_max_power_in_volts_and_milliamps(VOLTS, MAX_CURRENT_IN_MA);
-  delay(100);
+  delay(1000);
 }
 
 void (*patterns[])() = {
@@ -45,15 +41,12 @@ void (*patterns[])() = {
   rain
 };
 
-int patternId = 0;
-int maxPatternId = sizeof( patterns ) / sizeof(patterns[0]);
-
 void loop () {
-  FastLED.setBrightness(Global::max_bright);
   patterns[Global::patternId]();
   Global::firstTimeRunningThroughPattern = false;
   show_at_max_brightness_for_power();
   delay(1000 / fps);
+  int maxPatternId = sizeof( patterns ) / sizeof(patterns[0]);
   EVERY_N_SECONDS(ROTATION_IN_SECONDS) {
     Global::nextPattern(maxPatternId);
   }
