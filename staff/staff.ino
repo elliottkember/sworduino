@@ -6,7 +6,6 @@ namespace Global {
   bool firstTimeRunningThroughPattern = false;
   int hue = 50;
   uint8_t max_bright = 220;
-  uint16_t frameDelay = 1; // not actually used yet
   int patternId = 0;
 
   void printPixels(CRGB (*calculatePixel)(int)) {

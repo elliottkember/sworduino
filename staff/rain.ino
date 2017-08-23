@@ -22,13 +22,13 @@ namespace Rain {
       for (int i = NUM_LEDS; i > frameSize; i--) {
         Global::leds[i] = Global::leds[i-frameSize];
         if (Global::leds[i].getAverageLight() > 0) {
-          Global::leds[i] = CHSV(lean * 255, 180, 255);
+          Global::leds[i] = CHSV(hue, 180, 255);
         }
       }
       for (int i = 0; i <= frameSize + 1; i++) {
         int on = random8(100) > 80 ? 255 : 0;
-//        Global::leds[i] = CHSV(hue, 255, on);
-        Global::leds[i] = CHSV(lean * 255, 180, on);
+        Global::leds[i] = CHSV(hue, 255, on);
+//        Global::leds[i] = CHSV(lean * 255, 180, on);
         count();
       }
     }
