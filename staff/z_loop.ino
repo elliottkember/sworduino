@@ -1,12 +1,12 @@
 void (*patterns[])() = {
-  beautifulSparkles,
-  discoBarber1,
-  discoBarber2,
+//  beautifulSparkles,
+//  discoBarber1,
+//  discoBarber2,
   rain,
-  sparkles,
-  dave,
-  shootingGradients,
-  discoTwirl,
+//  sparkles,
+//  dave,
+//  shootingGradients,
+//  discoTwirl,
 //  discoTwirl2,
 };
 
@@ -16,10 +16,14 @@ int maxPatternId = sizeof( patterns ) / sizeof(patterns[0]);
 void setup() {
   randomSeed(analogRead(0));
   Serial.begin(57600);
-  LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(Global::leds, NUM_LEDS);
+//  LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(Global::leds, NUM_LEDS);
   set_max_power_in_volts_and_milliamps(VOLTS, MAX_CURRENT_IN_MA);
   // setupPropShield();
   // setupWifi();
+
+  LEDS.addLeds<APA102, BGR>(Global::leds, NUM_LEDS);
+  pinMode(7, OUTPUT);
+  digitalWrite(7, HIGH);
 
   delay(100);
 }

@@ -5,10 +5,10 @@
 #define qsuba(x, b)  ((x>b)?x-b:0)
 #define LED_DT 7
 #define COLOR_ORDER GRB
-#define LED_TYPE WS2812B
+#define LED_TYPE APA102
 #define VOLTS 5
 #define NUM_LEDS 300
-#define CIRCUMFERENCE 8
+#define CIRCUMFERENCE 9
 #define ROTATION_IN_SECONDS 30
 #define fps 30
 
@@ -25,19 +25,21 @@ namespace Global {
 void setup() {
   randomSeed(analogRead(0));
   Serial.begin(57600);
-  FastLED.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(Global::leds, NUM_LEDS)
-    .setCorrection(TypicalSMD5050);
-  FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);
+  // FastLED.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(Global::leds, NUM_LEDS).setCorrection(TypicalSMD5050);
+  FastLED.addLeds<LED_TYPE, COLOR_ORDER>(Global::leds, NUM_LEDS).setCorrection(TypicalSMD5050);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, 4000);
+  pinMode(7, OUTPUT);
+  digitalWrite(7, HIGH);
   delay(1000);
 }
 
 void (*patterns[])() = {
-  dave,
+//  dave,
   lantern,
-  beautifulSparkles,
-  shootingGradients,
-  discoTwirl2,
-  rain
+//  beautifulSparkles,
+//  shootingGradients,
+//  discoTwirl2,
+//  rain
 };
 
 int maxPatternId = sizeof( patterns ) / sizeof(patterns[0]);
