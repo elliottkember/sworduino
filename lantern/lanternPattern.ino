@@ -24,11 +24,11 @@ int snake = 0;
 
 void lanternPattern() {
 
-  EVERY_N_MILLISECONDS(10) {
+  EVERY_N_MILLISECONDS(20) {
     for (int i = 0; i < SNAKES_COUNT; i++) {
       uint16_t j = snakes[i];
       if (j > 0) {
-        leds[j] = CHSV(hue + ((NUM_LEDS - j) / 15), 240, 255);
+        leds[j] = CHSV(hue + ((NUM_LEDS - j) / 15) + 90, 240, 255);
   
         snakes[i] += 8;
         if (snakes[i] >= NUM_LEDS) snakes[i] = 0;

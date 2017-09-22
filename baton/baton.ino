@@ -7,7 +7,7 @@ uint8_t max_bright = 255;     // Overall brightness definition. It can be change
 int hue = 50;                 // Starting hue.
 bool firstTimeRunningThroughPattern = true;
 int fps = 30;
-int power_in_milliamps = 7000;
+int power_in_milliamps = 4000;
   
 #define NUM_LEDS 300         // Number of LED's.
 struct CRGB leds[NUM_LEDS];   // Initialize our LED array.
@@ -34,10 +34,10 @@ void setup() {
   Serial.begin(57600);
 
   // WS2812
-    LEDS.addLeds<WS2812B, 7, GRB>(leds, NUM_LEDS);
+//    LEDS.addLeds<WS2812B, 7, GRB>(leds, NUM_LEDS);
 
   // APA102
-//  FastLED.addLeds<APA102, BGR>(leds, NUM_LEDS);
+  FastLED.addLeds<APA102, BGR>(leds, NUM_LEDS);
   pinMode(7, OUTPUT);
   digitalWrite(7, HIGH);  // enable access to LEDs
   
