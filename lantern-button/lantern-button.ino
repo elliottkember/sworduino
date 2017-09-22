@@ -13,7 +13,7 @@ void setup() {
   Serial.begin(57600);
   LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setBrightness(MAX_BRIGHT);
-  set_max_power_in_volts_and_milliamps(5, 3000);
+  set_max_power_in_volts_and_milliamps(5, 1000);
   pinMode(14, INPUT_PULLUP);
   digitalWrite(14, HIGH);
   randomSeed(analogRead(0));
@@ -25,7 +25,7 @@ int numberOfLoopsPressed = 0;
 int switchMode = 1;
 int numberOfBrightnesses = 6;
 int brightnesses [6] = { 0, 32, 64, 128, 200, 255 };
-int brightnessIndex = 0;
+int brightnessIndex = 128;
 uint8_t bright = 1;
 int16_t newBright = brightnesses[brightnessIndex];
 
@@ -54,10 +54,11 @@ int getLevel() {
 }
 
 void loop () {
-//  lanternPattern(brightnessIndex);
-  fill_solid(leds, NUM_LEDS, CHSV(hue, 255, 255));
-  hue++;
-  Serial.println(hue);
+  Serial.println("a");
+  lanternPattern(brightnessIndex);
+//  fill_solid(leds, NUM_LEDS, CHSV(hue, 255, 255));
+//  hue++;
+//  Serial.println(hue);
   FastLED.setBrightness(255);
   FastLED.show();
 }

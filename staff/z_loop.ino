@@ -1,5 +1,4 @@
 void (*patterns[])() = {
-//  solid,
   beautifulSparkles,
   discoBarber1,
   discoBarber2,
@@ -8,7 +7,7 @@ void (*patterns[])() = {
   dave,
   shootingGradients,
   discoTwirl,
-  discoTwirl2,
+//  discoTwirl2,
 };
 
 int patternId = 0;
@@ -26,14 +25,19 @@ void setup() {
 }
 
 void loop () {
-  FastLED.setBrightness(Global::max_bright);
+
   Global::firstTimeRunningThroughPattern = true;
   unsigned int endTime = millis() + ROTATION_IN_MS;
   while (millis() < endTime) {
     // updateMotion();
     patterns[Global::patternId]();
     Global::firstTimeRunningThroughPattern = false;
-    show_at_max_brightness_for_power();
+    // show_at_max_brightness_for_power();
+    EVERY_N_SECONDS(10) {
+      if (Global::max_bright > 128) Global::max_bright -= 1;
+    }
+    FastLED.setBrightness(Global::max_bright);
+    FastLED.show();
   }
   if (maxPatternId > 1) {
     Global::firstTimeRunningThroughPattern = true;

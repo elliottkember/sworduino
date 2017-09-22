@@ -23,10 +23,7 @@ void setup() {
   delay(50);
 }
 
-void loop () {
+void loop() {
   lanternPattern();
-  show_at_max_brightness_for_power();
-//  delay(10);
+  FastLED.show();
 }
-
-

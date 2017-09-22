@@ -11,7 +11,7 @@ namespace Rain {
     }
   }
 
-  void draw() {    
+  void draw() {
     if (Global::firstTimeRunningThroughPattern) {
       for (int i = NUM_LEDS; i > 0; i--) {
         int on = random8(100) > 80 ? 255 : 0;
