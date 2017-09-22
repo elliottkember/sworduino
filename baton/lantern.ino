@@ -18,7 +18,7 @@ namespace Lantern {
         if (j > 0 && j < NUM_LEDS) {
           int h = hue + ((NUM_LEDS - j) / 15) + snakeHueOffset;
           Global::leds[j] = CHSV(h, 240, 255);
-          snakes[i] += 8;
+          snakes[i] += CIRCUMFERENCE;
           if (snakes[i] >= NUM_LEDS) snakes[i] = 0;
         }
       }
