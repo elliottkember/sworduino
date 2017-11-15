@@ -98,7 +98,7 @@ void loop() {
       uint8_t g = fastCosineCalc(((y << 3) + t + fastCosineCalc(((t3 >> 2) + (x << 3))))) * brightnessScale;
       uint8_t b = fastCosineCalc(((y << 3) + t2 + fastCosineCalc((t + x + (g >> 2))))) * brightnessScale;
       
-      //uncomment the following to enable gamma correction
+      //remove the following to disable gamma correction
       r = pgm_read_byte_near(exp_gamma+r);  
       g = pgm_read_byte_near(exp_gamma+g);
       b = pgm_read_byte_near(exp_gamma+b);
