@@ -1,3 +1,6 @@
+#include <ArduinoJson.h>
+
+DynamicJsonBuffer jsonBuffer(200);
 int numberOfSparkles = 0;
 bool increasing = true;
 #define CIRCUMFERENCE 9;

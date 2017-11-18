@@ -17,7 +17,8 @@ void setup() {
   digitalWrite(7, HIGH);  // enable access to LEDs - SPI?
 
   // APA102:
-  LEDS.addLeds<APA102, COLOR_ORDER>(leds, NUM_LEDS);
+  LEDS.addLeds<APA102, COLOR_ORDER>(leds, NUM_LEDS)
+      .setCorrection(TypicalSMD5050);
   // FastLED.addLeds<APA102, 7, 11, RGB>(leds, NUM_LEDS);
   // WS2812B:
   // FastLED.addLeds<WS2812B, 7, RGB>(leds, NUM_LEDS);
