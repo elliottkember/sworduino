@@ -17,11 +17,11 @@ void setup() {
 void loop() {
   if(Serial1.available()) {
     JsonObject& root = jsonBuffer.parseObject(Serial1);
+
     int hue = (float)root["hue"] * 255;
     int patternId = root["patternId"];
     float speed = root["speed"];
     float brightness = root["brightness"];
-     // TODO: setOptions(hue, patternId, speed, brightness);  
     if (brightness) FastLED.setBrightness(brightness * 255);
   }
   FastLED.show();
