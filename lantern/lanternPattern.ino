@@ -5,7 +5,7 @@ int numberOfSparkles = 0;
 bool increasing = true;
 #define CIRCUMFERENCE 9;
 #define SNAKES_COUNT 50
-uint8_t hue = 50;                 // Starting hue.
+uint8_t hue = 50;
 uint16_t snakes[SNAKES_COUNT];
 int snake = 0;
 float speed = 1;
@@ -22,6 +22,10 @@ int curve(int value, int difference, int maximum) {
     value += difference;
   }
   return value;
+}
+
+void setupLanternPattern() {
+  // Set up Serial for lantern pattern
 }
 
 void lanternPattern() {
