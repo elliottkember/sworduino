@@ -1,6 +1,6 @@
 #include <ArduinoJson.h>
 
-DynamicJsonBuffer jsonBuffer(200);
+DynamicJsonBuffer jsonBuffer(500);
 int numberOfSparkles = 0;
 bool increasing = true;
 #define CIRCUMFERENCE 9;
@@ -8,7 +8,7 @@ bool increasing = true;
 uint8_t hue = 50;
 uint16_t snakes[SNAKES_COUNT];
 int snake = 0;
-float speed = 1;
+int speed = 1;
 bool readSerial = true;
 
 int curve(int value, int difference, int maximum) {
@@ -26,16 +26,31 @@ int curve(int value, int difference, int maximum) {
 
 void setupLanternPattern() {
   // Set up Serial for lantern pattern
+  Serial1.begin(9600);
+  Serial1.setTimeout(10);
 }
 
 void lanternPattern() {
   if (readSerial) {
     if(Serial1.available()) {
       JsonObject& root = jsonBuffer.parseObject(Serial1);
-      speed = root["speed"];
-      hue = (float)root["hue"] * 255;
-      int brightness = (float)root["brightness"] * 255;
-      if (brightness) FastLED.setBrightness(brightness * 255);
+      
+      float hueDecimal = root["hue"];
+      if (hueDecimal) {
+        hue = hueDecimal * 255;
+      }
+      
+      float brightnessDecimal = root["brightness"];
+      if (brightnessDecimal) {
+       brightnessDecimal = brightnessDecimal * 255.0;
+       if (brightnessDecimal < 3.0) brightnessDecimal = 0;
+       FastLED.setBrightness(brightnessDecimal);
+      }
+      
+      float speedDecimal = root["speed"];
+      if (speedDecimal) {
+        speed = (speedDecimal * 50);
+      }
     }
   } else {
     EVERY_N_MILLISECONDS(100) {

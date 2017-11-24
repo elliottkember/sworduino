@@ -1,26 +1,26 @@
-// #define FASTLED_ALLOW_INTERRUPTS 0
-
+#define FASTLED_ALLOW_INTERRUPTS 0
 #include "FastLED.h"
 
-#define LED_DATA 7 // false for SPI
-#define LED 11 // false for SPI
-#define COLOR_ORDER GRB
-#define LED_TYPE
-#define STARTING_BRIGHTNESS = 255;
-#define NUM_LEDS = 300
-#define SPI = true
+#define LED_DATA 7
+#define LED_CLOCK 11
+
+#define COLOR_ORDER BGR
+#define LED_TYPE APA102
+#define STARTING_BRIGHTNESS 255
+#define NUM_LEDS 600
+#define SPI true
 
 struct CRGB leds[NUM_LEDS];
 
 void setup() {
   if (LED_TYPE == APA102) {
-    if (!LED_DATA && !LED_CLOCK) {
+    if (SPI) {
       // enable access to LEDs via SPI
       pinMode(7, OUTPUT);
       digitalWrite(7, HIGH);
-      FastLED.addLeds<APA102, COLOR_ORDER>(leds, NUM_LEDS)
+      FastLED.addLeds<APA102, COLOR_ORDER>(leds, NUM_LEDS);
     } else {
-      FastLED.addLeds<APA102, LED_DATA, LED_CLOCK, RGB>(leds, NUM_LEDS);
+      FastLED.addLeds<APA102, LED_DATA, LED_CLOCK, COLOR_ORDER>(leds, NUM_LEDS);
     }
   } else {
     FastLED.addLeds<WS2812B, LED_DATA, RGB>(leds, NUM_LEDS);
