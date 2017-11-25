@@ -2,27 +2,16 @@
 
 DynamicJsonBuffer jsonBuffer(500);
 int numberOfSparkles = 0;
-bool increasing = true;
-#define CIRCUMFERENCE 9;
+
+#define CIRCUMFERENCE 9
 #define SNAKES_COUNT 50
+#define READ_SERIAL true
+
 uint8_t hue = 50;
 uint16_t snakes[SNAKES_COUNT];
+
 int snake = 0;
 int speed = 1;
-bool readSerial = true;
-
-int curve(int value, int difference, int maximum) {
-  if (value < maximum && increasing) {
-    value += difference;
-  } else if (value > 1) {
-    value -= difference;
-    increasing = false;
-  } else {
-    increasing = true;
-    value += difference;
-  }
-  return value;
-}
 
 void setupLanternPattern() {
   // Set up Serial for lantern pattern
@@ -30,35 +19,48 @@ void setupLanternPattern() {
   Serial1.setTimeout(10);
 }
 
-void lanternPattern() {
-  if (readSerial) {
-    if(Serial1.available()) {
-      JsonObject& root = jsonBuffer.parseObject(Serial1);
-      
-      float hueDecimal = root["hue"];
-      if (hueDecimal) {
-        hue = hueDecimal * 255;
-      }
-      
-      float brightnessDecimal = root["brightness"];
-      if (brightnessDecimal) {
-       brightnessDecimal = brightnessDecimal * 255.0;
-       if (brightnessDecimal < 3.0) brightnessDecimal = 0;
-       FastLED.setBrightness(brightnessDecimal);
-      }
-      
-      float speedDecimal = root["speed"];
-      if (speedDecimal) {
-        speed = (speedDecimal * 50);
-      }
+void setSettingsFromSerial() {
+  if(Serial1.available()) {
+    JsonObject& root = jsonBuffer.parseObject(Serial1);
+    
+    float hueDecimal = root["hue"];
+    if (hueDecimal) {
+      hue = hueDecimal * 255;
     }
+    
+    float brightnessDecimal = root["brightness"];
+    if (brightnessDecimal) {
+     brightnessDecimal = brightnessDecimal * 255.0;
+     if (brightnessDecimal < 3.0) brightnessDecimal = 0;
+     FastLED.setBrightness(brightnessDecimal);
+    }
+    
+    float speedDecimal = root["speed"];
+    if (speedDecimal) {
+      speed = (speedDecimal * 50);
+    }
+  }
+}
+
+// The constants here have to change for APA102/WS2812B. 
+// The timing depends on how many LEDs there are, especially if you're using WS2812B.
+#define FADE_MS 20
+#define SPARKLE_MS 60
+#define CURVE_MS 200
+#define SEED_SNAKES_MS 50
+#define MAX_SPARKLES_AS_A_PERCENTAGE_OF_NUM_LEDS 0.03
+#define MOVE_SNAKES_MS 40
+
+void lanternPattern() {
+  if (READ_SERIAL) {
+    setSettingsFromSerial();
   } else {
     EVERY_N_MILLISECONDS(100) {
       hue -= 1;
     }
   }
 
-  EVERY_N_MILLISECONDS(40) {
+  EVERY_N_MILLISECONDS(MOVE_SNAKES_MS) {
     for (int snakeIndex = 0; snakeIndex < SNAKES_COUNT; snakeIndex++) {
       uint16_t snakeHead = snakes[snakeIndex];
       if (snakeHead > 0) {
@@ -71,31 +73,29 @@ void lanternPattern() {
       }
     }
   }
-
-  EVERY_N_MILLISECONDS(50) {
+  
+  EVERY_N_MILLISECONDS(SEED_SNAKES_MS) {
+    float randomness = 0.5;
     // Snake seeding - randomly start a snake based on numberOfSparkles
-    if (random16(NUM_LEDS * 0.5) < numberOfSparkles) {
-      snakes[snake] = random(7);
+    if (random16(NUM_LEDS * randomness) < numberOfSparkles) {
+      snakes[snake] = random(CIRCUMFERENCE);
       snake++;
       if (snake >= SNAKES_COUNT) snake = 0;
     }
   }
 
-  EVERY_N_MILLISECONDS(20) {
-    // tood nscale8_video
+  EVERY_N_MILLISECONDS(FADE_MS) {
     fadeToBlackBy(leds, NUM_LEDS, speed);
   }
 
-  EVERY_N_MILLISECONDS(60) {
+  EVERY_N_MILLISECONDS(SPARKLE_MS) {
     for (int i = 0; i < numberOfSparkles; i++) {
       int pos = random16(NUM_LEDS);
-      if (!leds[pos]) {
-        leds[pos] = CHSV(hue + (pos / 15), 255, 128);
-      }
+      if (!leds[pos]) leds[pos] = CHSV(hue + (pos / 15), 255, 128);
     }
   }
 
-  EVERY_N_MILLISECONDS(200) {
-    numberOfSparkles = curve(numberOfSparkles, 4, NUM_LEDS * 0.03);
+  EVERY_N_MILLISECONDS(CURVE_MS) {
+    numberOfSparkles = curve(numberOfSparkles, 4, NUM_LEDS * MAX_SPARKLES_AS_A_PERCENTAGE_OF_NUM_LEDS);
   }
 }
