@@ -19,25 +19,42 @@ void setupLanternPattern() {
   Serial1.setTimeout(10);
 }
 
+int newBrightness = 255;
+int newHue = hue;
 void setSettingsFromSerial() {
   if(Serial1.available()) {
     JsonObject& root = jsonBuffer.parseObject(Serial1);
     
     float hueDecimal = root["hue"];
     if (hueDecimal) {
-      hue = hueDecimal * 255;
+      newHue = hueDecimal * 255;
     }
     
     float brightnessDecimal = root["brightness"];
     if (brightnessDecimal) {
-     brightnessDecimal = brightnessDecimal * 255.0;
-     if (brightnessDecimal < 3.0) brightnessDecimal = 0;
-     FastLED.setBrightness(brightnessDecimal);
+      newBrightness = brightnessDecimal * 255.0;
+      if (newBrightness < 3.0) newBrightness = 0;
     }
     
     float speedDecimal = root["speed"];
     if (speedDecimal) {
       speed = (speedDecimal * 50);
+    }
+  }
+
+  EVERY_N_MILLISECONDS(10) {
+    if (newBrightness > FastLED.getBrightness()) {
+      FastLED.setBrightness(FastLED.getBrightness() + 1);
+    } else if (newBrightness < FastLED.getBrightness()) {
+      FastLED.setBrightness(FastLED.getBrightness() - 1);
+    }
+  }
+
+  EVERY_N_MILLISECONDS(10) {
+    if (newHue > hue) {
+      hue++;
+    } else if (newHue < hue) {
+      hue--;
     }
   }
 }
