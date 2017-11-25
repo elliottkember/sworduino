@@ -5,15 +5,17 @@
 #define LED_CLOCK 11
 
 #define COLOR_ORDER BGR
-#define LED_TYPE APA102
 #define STARTING_BRIGHTNESS 255
 #define NUM_LEDS 600
 #define SPI true
 
+#define apa102 true
+#define NUM_LEDS 600
+
 struct CRGB leds[NUM_LEDS];
 
 void setup() {
-  if (LED_TYPE == APA102) {
+  if (apa102) {
     if (SPI) {
       // enable access to LEDs via SPI
       pinMode(7, OUTPUT);
@@ -23,9 +25,9 @@ void setup() {
       FastLED.addLeds<APA102, LED_DATA, LED_CLOCK, COLOR_ORDER>(leds, NUM_LEDS);
     }
   } else {
-    FastLED.addLeds<WS2812B, LED_DATA, RGB>(leds, NUM_LEDS);
+    FastLED.addLeds<WS2812B, LED_DATA, COLOR_ORDER>(leds, NUM_LEDS);
   }
-
+  
   Serial.begin(57600);
   set_max_power_in_volts_and_milliamps(5, 3000);
   randomSeed(analogRead(0));
