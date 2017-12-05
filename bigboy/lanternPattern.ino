@@ -1,7 +1,13 @@
 #include <ArduinoJson.h>
 
 DynamicJsonBuffer jsonBuffer(500);
-int numberOfSparkles = 0;
+void setupLanternPattern() {
+  // Set up Serial for lantern pattern
+  Serial1.begin(9600);
+  Serial1.setTimeout(10);
+}
+
+
 
 #define CIRCUMFERENCE 22
 #define SNAKES_COUNT 50
@@ -9,18 +15,12 @@ int numberOfSparkles = 0;
 
 uint8_t hue = 50;
 uint16_t snakes[SNAKES_COUNT];
-
+int numberOfSparkles = 0;
+int newBrightness = 128;
+int newHue = hue;
 int snake = 0;
 int speed = 1;
 
-void setupLanternPattern() {
-  // Set up Serial for lantern pattern
-  Serial1.begin(9600);
-  Serial1.setTimeout(10);
-}
-
-int newBrightness = 128;
-int newHue = hue;
 void setSettingsFromSerial() {
     if(Serial1.available()) {
       JsonObject& root = jsonBuffer.parseObject(Serial1);
@@ -104,11 +104,6 @@ void lanternPattern() {
 
   EVERY_N_MILLISECONDS(FADE_MS) {
     nscale8(leds, NUM_LEDS, 255 - speed);
-//    fadeToBlackBy(leds, NUM_LEDS, speed);
-//    scale8_video(leds, NUM_LEDS, speed);
-//    for(int i = 0; i < NUM_LEDS; i++) { 
-//      leds[i].nscale8(leds[i].getLuma() - 1); 
-//    }
   }
 
   EVERY_N_MILLISECONDS(SPARKLE_MS) {
