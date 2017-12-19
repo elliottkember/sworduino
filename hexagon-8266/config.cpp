@@ -17,7 +17,7 @@
 //#endif
 
 //FastLED
-#define N_LEDS 1500 // Number of LEDs on our light strip // Max seems to be 1520 on ESP32
+#define N_LEDS 36 // Number of LEDs on our light strip // Max seems to be 1520 on ESP32
 #define MAX_ALLOWED_VOLTS 5
 #define MAX_ALLOWED_MILLIAMPS 5000
 #define LED_TYPE WS2812B

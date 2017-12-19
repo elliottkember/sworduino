@@ -18,13 +18,16 @@ namespace Main {
 
   uint8_t brightness = 255; // From 0-255, 0 makes the device black, 255 keeps the brightness as is defined by the routine
   
-  const int num_routines = 2;
+  const int num_routines = 5;
   
   const char* routines[num_routines] PROGMEM = {
     // 0
     "Off",
-    "Hexagon",
-    // 1
+    "Spin",
+    "Fast Spin",
+    "Slow Spin",
+    "Slow Pulse",
+    // 5
   };
 
   int SafeRoutineID(int i) {
@@ -52,9 +55,9 @@ namespace Main {
 //    pinMode(DATA_PIN, OUTPUT);
 //    pinMode(BUTTON_PIN, INPUT_PULLUP);
 //    digitalWrite(DATA_PIN, HIGH); // Initialize all LEDs to be off by default
-//    #if defined(ESP8266) || defined(ESP32)
+    #if defined(ESP8266) || defined(ESP32)
     Wifi::setup();
-//    #endif
+    #endif
 
     which_routine = pick_routine();
   }
@@ -101,6 +104,11 @@ namespace Main {
       teensy();
     #endif
 
+    for(int i=0; i<N_CELLS; i++){
+      Global::led_arr[i] = CRGB(80, 0, 0);
+    }
+    FastLED.show();
+
     fastled();
   }
 
@@ -112,7 +120,6 @@ void setup() {
   wdt_disable();
   pinMode(13, OUTPUT);
   Main::setup();
-  Serial.println('hi there');
   #if defined(ESP8266)
   Serial.println("THIS IS AN ESP8266");
   #endif
@@ -126,13 +133,17 @@ void loop() {
   ESP.wdtFeed();
   bool finishedRound = false;
   int gameDelay = DELAY;
-
-//  Serial.println(analogRead(A0));
   
   if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Off") == 0) {
     finishedRound = black();
-  } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Hexagon") == 0) {
+  } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Spin") == 0) {
     hexagon();
+  } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Fast Spin") == 0) {
+    fastHexagon();
+  } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Slow Spin") == 0) {
+    slowHexagon();
+  } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Slow Pulse") == 0) {
+    slowPulse();
   }
 
   if(Main::brightness < 255) {

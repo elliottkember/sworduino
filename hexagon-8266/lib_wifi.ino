@@ -30,7 +30,7 @@ namespace Wifi {
   const int LED_ON = LOW;
   const int LED_OFF = HIGH;
   const int led = BUILTIN_LED;
-  const unsigned long heartBeatEvery = 7200000; // Checks in with the server every N milliseconds
+  const unsigned long heartBeatEvery = 60000; // 7200000; // Checks in with the server every N milliseconds
   unsigned long lastHeartBeat; // Millisecond timestamp at time of last heartbeat
   //WiFiClient client;
   WiFiClientSecure client;
