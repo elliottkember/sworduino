@@ -18,7 +18,7 @@ namespace Main {
 
   uint8_t brightness = 255; // From 0-255, 0 makes the device black, 255 keeps the brightness as is defined by the routine
   
-  const int num_routines = 5;
+  const int num_routines = 6;
   
   const char* routines[num_routines] PROGMEM = {
     // 0
@@ -27,6 +27,7 @@ namespace Main {
     "Fast Spin",
     "Slow Spin",
     "Slow Pulse",
+    "Beautiful Sparkles",
     // 5
   };
 
@@ -91,7 +92,7 @@ namespace Main {
     // Define the data and clock pins here to use hardware SPI 
     // as per https://github.com/FastLED/FastLED/wiki/SPI-Hardware-or-Bit-banging
 //    FastLED.addLeds<LED_TYPE, DATA_PIN, CLOCK_PIN, LED_COLOR_ORDER>(Global::led_arr, N_LEDS);
-    FastLED.addLeds<LED_TYPE, DATA_PIN, LED_COLOR_ORDER>(Global::led_arr, N_LEDS);
+    FastLED.addLeds<LED_TYPE, 5, LED_COLOR_ORDER>(Global::led_arr, N_LEDS);
     FastLED.setMaxPowerInVoltsAndMilliamps(MAX_ALLOWED_VOLTS, MAX_ALLOWED_MILLIAMPS);
     FastLED.setCorrection(ClearBlueSky);
   }
@@ -140,6 +141,8 @@ void loop() {
     hexagon();
   } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Fast Spin") == 0) {
     fastHexagon();
+  } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Beautiful Sparkles") == 0) {
+    finishedRound = beautiful_sparkles();
   } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Slow Spin") == 0) {
     slowHexagon();
   } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Slow Pulse") == 0) {
