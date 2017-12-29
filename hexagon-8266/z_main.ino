@@ -18,7 +18,7 @@ namespace Main {
 
   uint8_t brightness = 255; // From 0-255, 0 makes the device black, 255 keeps the brightness as is defined by the routine
   
-  const int num_routines = 6;
+  const int num_routines = 7;
   
   const char* routines[num_routines] PROGMEM = {
     // 0
@@ -28,6 +28,7 @@ namespace Main {
     "Slow Spin",
     "Slow Pulse",
     "Beautiful Sparkles",
+    "Waterfall",
     // 5
   };
 
@@ -143,6 +144,8 @@ void loop() {
     fastHexagon();
   } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Beautiful Sparkles") == 0) {
     finishedRound = beautiful_sparkles();
+  } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Waterfall") == 0) {
+    finishedRound = waterfall();
   } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Slow Spin") == 0) {
     slowHexagon();
   } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Slow Pulse") == 0) {
