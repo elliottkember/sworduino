@@ -37,7 +37,7 @@
 
 // JPP
 #define DEBUG false
-#define LEDS_PER_ROW 40
+#define LEDS_PER_ROW 8
 #define N_CELLS (N_LEDS + N_LEDS%LEDS_PER_ROW)
 #define FPS 60
 #define DELAY (1000/FPS) // in milliseconds

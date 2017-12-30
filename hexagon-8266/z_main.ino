@@ -18,7 +18,7 @@ namespace Main {
 
   uint8_t brightness = 255; // From 0-255, 0 makes the device black, 255 keeps the brightness as is defined by the routine
   
-  const int num_routines = 7;
+  const int num_routines = 8;
   
   const char* routines[num_routines] PROGMEM = {
     // 0
@@ -29,6 +29,7 @@ namespace Main {
     "Slow Pulse",
     "Beautiful Sparkles",
     "Waterfall",
+    "Flame",
     // 5
   };
 
@@ -150,7 +151,10 @@ void loop() {
     slowHexagon();
   } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Slow Pulse") == 0) {
     slowPulse();
-  }
+  } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Flame") == 0) {
+    // Full range flame
+    finishedRound = flame(false, -1, -1);
+  } 
 
   if(Main::brightness < 255) {
     nscale8_video(Global::led_arr, N_LEDS, Main::brightness);
