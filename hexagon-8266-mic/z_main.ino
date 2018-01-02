@@ -17,9 +17,9 @@ namespace Main {
   #endif
 
   uint8_t brightness = 255; // From 0-255, 0 makes the device black, 255 keeps the brightness as is defined by the routine
-
+  
   const int num_routines = 5;
-
+  
   const char* routines[num_routines] PROGMEM = {
     // 0
     "Off",
@@ -41,7 +41,7 @@ namespace Main {
   const char* SafeRoutineName(int i) {
     return routines[SafeRoutineID(i)];
   }
-
+  
   int which_routine;
   bool buttonValue = true;
 
@@ -52,19 +52,19 @@ namespace Main {
   void wemos() {
     ESP.wdtDisable();
     Serial.begin(115200);
-    // pinMode(DATA_PIN, OUTPUT);
-    // pinMode(BUTTON_PIN, INPUT_PULLUP);
-    // digitalWrite(DATA_PIN, HIGH); // Initialize all LEDs to be off by default
+//    pinMode(DATA_PIN, OUTPUT);
+//    pinMode(BUTTON_PIN, INPUT_PULLUP);
+//    digitalWrite(DATA_PIN, HIGH); // Initialize all LEDs to be off by default
     #if defined(ESP8266) || defined(ESP32)
     Wifi::setup();
     #endif
 
     which_routine = pick_routine();
   }
-
+  
   void teensy() {
     Serial.begin(31250); // No error on https://www.pjrc.com/teensy/td_uart.html
-
+  
     // Configure the Teensy based on the output pin we have chosen for the LED strip
     pinMode(DATA_PIN, OUTPUT);
     pinMode(BUTTON_PIN, INPUT_PULLUP);
@@ -82,13 +82,13 @@ namespace Main {
     Entropy.Initialize();
     randomSeed(Entropy.random());
     #endif
-
+    
     which_routine = pick_routine();
   }
 
   void fastled() {
     // Tell FastLED we are using an APA102 LED strand
-    // Define the data and clock pins here to use hardware SPI
+    // Define the data and clock pins here to use hardware SPI 
     // as per https://github.com/FastLED/FastLED/wiki/SPI-Hardware-or-Bit-banging
 //    FastLED.addLeds<LED_TYPE, DATA_PIN, CLOCK_PIN, LED_COLOR_ORDER>(Global::led_arr, N_LEDS);
     FastLED.addLeds<LED_TYPE, DATA_PIN, LED_COLOR_ORDER>(Global::led_arr, N_LEDS);
@@ -133,7 +133,7 @@ void loop() {
   ESP.wdtFeed();
   bool finishedRound = false;
   int gameDelay = DELAY;
-
+  
   if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Off") == 0) {
     finishedRound = black();
   } else if ( strcmp(Main::SafeRoutineName(Main::which_routine) , "Spin") == 0) {
@@ -147,8 +147,7 @@ void loop() {
   }
 
   if(Main::brightness < 255) {
-    // nscale8_video(Global::led_arr, N_LEDS, Main::brightness);
-    FastLED.setBrightness(Main::brightness);
+    nscale8_video(Global::led_arr, N_LEDS, Main::brightness);
   }
 
   FastLED.show();
@@ -169,7 +168,7 @@ void loop() {
       newButtonValue = false;
     }
     #endif
-
+    
     // For now, any input on the remote will just be treated as a button press
     #ifdef IRremote_h
     decode_results results;
@@ -182,9 +181,9 @@ void loop() {
           Serial.println(results.decode_type);
           Serial.println(millis());
         }
-
+        
         Main::irInput = results;
-
+  
         // Mimic the trigger phase
         Main::buttonValue = true;
         newButtonValue = false;
@@ -192,19 +191,19 @@ void loop() {
       Main::irrecv.resume(); // Receive the next value
     }
     #endif
-
+  
     // React to button press
     if(Main::buttonValue != newButtonValue){
       if(DEBUG) {
         Serial.printf("Button value now %d, was %d.\n", newButtonValue, Main::buttonValue);
       }
       Main::buttonValue = newButtonValue;
-
+  
       // Act on the button press only during the "trigger" phase of the button (which is "off")
       if(!newButtonValue) {
         Main::which_routine = (Main::which_routine+1)%Main::num_routines;
         finishedRound = true;
-
+  
         // Reset stateful games
         Main::reset_all();
 
@@ -212,7 +211,7 @@ void loop() {
         changeRoutine = true;
       }
     }
-
+    
     // Then, wake up, check to see if there is a button press or an IR signal
     // Apparently this is no more processor intensive on an arduino than delay()
     // but it's better because it allows interrupts.
@@ -257,3 +256,6 @@ uint8_t CurrentBrightness() {
 void ChooseBrightness(uint8_t brightness) {
   Main::brightness = brightness;
 }
+
+
+

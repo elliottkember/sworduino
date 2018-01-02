@@ -1,46 +1,45 @@
 #include <ArduinoJson.h>
 
 DynamicJsonBuffer jsonBuffer(500);
-int numberOfSparkles = 0;
-
-#define CIRCUMFERENCE 9
-#define SNAKES_COUNT 50
-#define READ_SERIAL true
-
-uint8_t hue = 50;
-uint16_t snakes[SNAKES_COUNT];
-
-int snake = 0;
-int speed = 1;
-
 void setupLanternPattern() {
   // Set up Serial for lantern pattern
   Serial1.begin(9600);
   Serial1.setTimeout(10);
 }
 
-int newBrightness = 255;
+#define CIRCUMFERENCE 22
+#define SNAKES_COUNT 50
+#define READ_SERIAL false
+
+uint8_t hue = 50;
+uint16_t snakes[SNAKES_COUNT];
+int numberOfSparkles = 0;
+int newBrightness = 128;
 int newHue = hue;
+int snake = 0;
+int speed = 1;
+
 void setSettingsFromSerial() {
-  if(Serial1.available()) {
-    JsonObject& root = jsonBuffer.parseObject(Serial1);
-    
-    float hueDecimal = root["hue"];
-    if (hueDecimal) {
-      newHue = hueDecimal * 255;
-    }
-    
-    float brightnessDecimal = root["brightness"];
-    if (brightnessDecimal) {
-      newBrightness = brightnessDecimal * 255.0;
-      if (newBrightness < 3.0) newBrightness = 0;
-    }
-    
-    float speedDecimal = root["speed"];
-    if (speedDecimal) {
-      speed = (speedDecimal * 50);
-    }
-  }
+//    if(Serial1.available()) {
+//      JsonObject& root = jsonBuffer.parseObject(Serial1);
+//      root.prettyPrintTo(Serial);
+//  
+//      float hueDecimal = root["hue"];
+//      if (hueDecimal) {
+//        newHue = hueDecimal * 255;
+//      }
+//  
+//      float brightnessDecimal = root["brightness"];
+//      if (brightnessDecimal) {
+//        newBrightness = brightnessDecimal * 255.0;
+//        if (newBrightness < 3.0) newBrightness = 0;
+//      }
+//  
+//      float speedDecimal = root["speed"];
+//      if (speedDecimal) {
+//        speed = (speedDecimal * 50);
+//      }
+//    }
 
   EVERY_N_MILLISECONDS(10) {
     if (newBrightness > FastLED.getBrightness()) {
@@ -59,13 +58,13 @@ void setSettingsFromSerial() {
   }
 }
 
-// The constants here have to change for APA102/WS2812B. 
+// The constants here have to change for APA102/WS2812B.
 // The timing depends on how many LEDs there are, especially if you're using WS2812B.
 #define FADE_MS 20
 #define SPARKLE_MS 60
 #define CURVE_MS 200
 #define SEED_SNAKES_MS 50
-#define MAX_SPARKLES_AS_A_PERCENTAGE_OF_NUM_LEDS 0.03
+#define MAX_SPARKLES_AS_A_PERCENTAGE_OF_NUM_LEDS 0.02
 #define MOVE_SNAKES_MS 40
 
 void lanternPattern() {
@@ -90,7 +89,7 @@ void lanternPattern() {
       }
     }
   }
-  
+
   EVERY_N_MILLISECONDS(SEED_SNAKES_MS) {
     float randomness = 0.5;
     // Snake seeding - randomly start a snake based on numberOfSparkles
@@ -102,7 +101,7 @@ void lanternPattern() {
   }
 
   EVERY_N_MILLISECONDS(FADE_MS) {
-    fadeToBlackBy(leds, NUM_LEDS, speed);
+    nscale8(leds, NUM_LEDS, 255 - speed);
   }
 
   EVERY_N_MILLISECONDS(SPARKLE_MS) {
