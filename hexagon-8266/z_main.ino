@@ -157,7 +157,9 @@ void loop() {
   } 
 
   if(Main::brightness < 255) {
-    nscale8_video(Global::led_arr, N_LEDS, Main::brightness);
+    //nscale8_video(Global::led_arr, N_LEDS, Main::brightness);
+    FastLED.setBrightness(Main::brightness);
+
   }
 
   FastLED.show();
