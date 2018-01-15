@@ -1,5 +1,31 @@
 uint8_t hue = 0;
 
+namespace Solid {
+  bool solid(uint8_t hue, uint8_t saturation, uint8_t value) {
+    for(int i=0; i<N_CELLS; i++){
+      Global::led_arr[i] = CHSV(hue, saturation, value);
+    }
+
+    return true;
+  }
+}
+
+bool black() {
+  return Solid::solid(0, 0, 0);
+}
+
+bool blue() {
+  return Solid::solid(0, 0, 255);
+}
+
+bool white() {
+  return Solid::solid(24, 192, 255);
+}
+
+bool warm_white() {
+  return Solid::solid(16, 224, 255);
+}
+
 void hexagon() {
   fill_rainbow(Global::led_arr, N_LEDS, hue, 5);
   EVERY_N_MILLISECONDS(10) {
