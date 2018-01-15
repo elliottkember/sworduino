@@ -1,8 +1,12 @@
 uint8_t hue = 0;
 
+namespace Global {
+  struct CRGB led_arr[N_LEDS]; //Init LED array
+}
+
 namespace Solid {
   bool solid(uint8_t hue, uint8_t saturation, uint8_t value) {
-    for(int i=0; i<N_CELLS; i++){
+    for(int i=0; i<N_LEDS; i++){
       Global::led_arr[i] = CHSV(hue, saturation, value);
     }
 
@@ -51,19 +55,19 @@ namespace Rainbow {
   bool initialized = false;
   uint8_t iteration = 0;
   uint8_t increment_every = 1;
-  uint8_t hue[N_CELLS];
+  uint8_t hue[N_LEDS];
 
   void setup(int beam_thickness, uint8_t incr) {
     increment_every = incr;
     int baseline = random(0, 254);
-    for(int i=0; i<N_CELLS; i++){
+    for(int i=0; i<N_LEDS; i++){
       hue[i] = (i/beam_thickness) + baseline;
     }
   }
 
   bool iterate() {
     if((iteration % increment_every) == 0){
-      for(int i=0; i<N_CELLS; i++){
+      for(int i=0; i<N_LEDS; i++){
         hue[i] += 1;
       }
     }
@@ -73,7 +77,7 @@ namespace Rainbow {
   }
 
   void paint() {
-    for(int i=0; i<N_CELLS; i++){
+    for(int i=0; i<N_LEDS; i++){
       Global::led_arr[i] = CHSV(hue[i], 255, 255);
     }
   }

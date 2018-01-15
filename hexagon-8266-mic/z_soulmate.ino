@@ -1,12 +1,14 @@
+#define FASTLED_ALLOW_INTERRUPTS 0
+#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
 #define MAX_ALLOWED_VOLTS 5
-#define N_CELLS (N_LEDS + N_LEDS%LEDS_PER_ROW)
 #define FPS 60
 #define DELAY (1000/FPS) // in milliseconds
+#define DEBUG false
 #define RANDOMIZE_ROUTINES false // true to iterate through all available routines without requiring a button press
 
 #if defined(ESP8266)
   #define DATA_PIN 5 // Which pin data is sent to on the ESP8266 (DOUT)
-  //  #define CLOCK_PIN 13 // Which pin the clock is triggered on the ESP8266 (SPI)
+  #define CLOCK_PIN 13 // Which pin the clock is triggered on the ESP8266 (SPI)
   #define BUTTON_PIN 3 // Which pin receives signal that a button was pushed?
   #define REMOTE_CONTROL_PIN -1 //Receives data from an IR remote control
 #elif defined(ESP32)
@@ -98,8 +100,7 @@ namespace Wifi {
 
   void handleChooseRoutine() {
     if (server.arg("routine") == "") {
-      // Invalid
-      //server.send(404, "text/plain", "Not found");
+      // server.send(404, "text/plain", "Not found");
       handleNotFound();
       return;
     }
@@ -112,7 +113,6 @@ namespace Wifi {
   void handleBrightness() {
     String brightness_submitted = server.arg("brightness");
     if(brightness_submitted.length() > 0) {
-      // Update it
       ChooseBrightness((uint8_t)brightness_submitted.toInt());
     }
 
@@ -122,17 +122,13 @@ namespace Wifi {
 
   void handleListRoutines() {
     String message = "{ \"CurrentRoutine\": " + CurrentRoutine() + ", \"Routines\": [ ";
-
     const char** routines = Routines();
     int i = 0;
     for (;i < NumRoutines()-1; i++) {
-      //Serial.println(routines[i]);
       message += "\"" + String(routines[i]) + "\", ";
     }
-
     // (Note that i was already incremented by the loop, no need to increment again)
     message += "\"" + String(routines[i]) + "\" ] }";
-
     server.send(200, "application/json", message);
   }
 
@@ -158,7 +154,6 @@ namespace Wifi {
     }
 
     client.println("POST /soulmate/v1/checkin HTTP/1.1");
-    //client.println("Host: test.com");
     client.println(String("Host: ") + String(host));
     client.println("User-Agent: Soulmate/1.0");
     client.println("Connection: close");
@@ -303,13 +298,6 @@ namespace Wifi {
 #endif
 
 
-
-
-
-
-
-
-
 #ifdef TEENSYDUINO
   // #include <IRremote.h>
   // #include <Entropy.h>
@@ -391,7 +379,10 @@ namespace Main {
     // Tell FastLED we are using an APA102 LED strand
     // Define the data and clock pins here to use hardware SPI
     // as per https://github.com/FastLED/FastLED/wiki/SPI-Hardware-or-Bit-banging
-    //    FastLED.addLeds<LED_TYPE, DATA_PIN, CLOCK_PIN, LED_COLOR_ORDER>(Global::led_arr, N_LEDS);
+
+    // LED SETUP LINES
+
+    // FastLED.addLeds<LED_TYPE, DATA_PIN, CLOCK_PIN, LED_COLOR_ORDER>(Global::led_arr, N_LEDS);
     FastLED.addLeds<LED_TYPE, DATA_PIN, LED_COLOR_ORDER>(Global::led_arr, N_LEDS);
     FastLED.setMaxPowerInVoltsAndMilliamps(MAX_ALLOWED_VOLTS, MAX_ALLOWED_MILLIAMPS);
     FastLED.setCorrection(ClearBlueSky);
@@ -405,7 +396,7 @@ namespace Main {
       teensy();
     #endif
 
-    for(int i=0; i<N_CELLS; i++){
+    for(int i=0; i<N_LEDS; i++){
       Global::led_arr[i] = CRGB(80, 0, 0);
     }
     FastLED.show();
@@ -521,6 +512,8 @@ void soulmateLoop() {
   }
 }
 
+// TODO: Should we remove all these?
+
 const char* ChooseRoutine(int i) {
   Main::which_routine = Main::SafeRoutineID(i);
   Main::reset_all();
@@ -547,6 +540,3 @@ uint8_t CurrentBrightness() {
 void ChooseBrightness(uint8_t brightness) {
   Main::brightness = brightness;
 }
-
-
-// Setup and main loop are in "z_main.ino"
