@@ -46,5 +46,6 @@ void setup() {
 }
 
 void loop() {
+  Serial.println("loop");
   soulmateLoop();
 }
