@@ -35,7 +35,6 @@ namespace Soulmate {
 }
 
 void playPattern(int routine) {
-  Serial.println(routine);
   switch (routine) {
     case 0:
       hexagon();

@@ -119,11 +119,13 @@ namespace Wifi {
   void handleListRoutines() {
     String message = "{ \"CurrentRoutine\": " + CurrentRoutine() + ", \"Routines\": [ ";
     const char** routines = Routines();
+
+    int numberOfRoutines = NumRoutines();
     int i = 0;
-    for (;i < NumRoutines()-1; i++) {
+    for (; i < numberOfRoutines - 1; i++) {
       message += "\"" + String(routines[i]) + "\", ";
     }
-    // (Note that i was already incremented by the loop, no need to increment again)
+    // // (Note that i was already incremented by the loop, no need to increment again)
     message += "\"" + String(routines[i]) + "\" ]";
 
     message += ", \"on\": ";
@@ -296,7 +298,7 @@ namespace Wifi {
     //   Serial.println("Resetting the wifi");
     //   //Serial.println(shouldResetWiFi);
     //   WiFi.disconnect(true);
-    //   ESP.restart();
+    //   // ESP.restart();
     // }
   }
 
@@ -333,7 +335,7 @@ namespace Soulmate {
   }
 
   void wemos() {
-    ESP.wdtDisable();
+    // ESP.wdtDisable();
     Serial.begin(115200);
     // pinMode(DATA_PIN, OUTPUT);
     // pinMode(BUTTON_PIN, INPUT_PULLUP);
@@ -362,11 +364,10 @@ namespace Soulmate {
       FastLED.addLeds<LED_TYPE, DATA_PIN, CLOCK_PIN, BGR>(Soulmate::led_arr, N_LEDS);
     #endif
     FastLED.setMaxPowerInVoltsAndMilliamps(MAX_ALLOWED_VOLTS, MAX_ALLOWED_MILLIAMPS);
-    FastLED.setCorrection(ClearBlueSky);
   }
 
   void setup() {
-    wdt_disable();
+    // wdt_disable();
     pinMode(13, OUTPUT);
 
     #if defined(ESP8266) || defined(ESP32)
@@ -385,14 +386,20 @@ namespace Soulmate {
   }
 
   void loop() {
-    ESP.wdtFeed();
+    // ESP.wdtFeed();
     bool finishedRound = false;
     int gameDelay = DELAY;
 
     if (on) {
       playPattern(Soulmate::which_routine);
-      if(Soulmate::brightness <= 255) {
-        FastLED.setBrightness(Soulmate::brightness);
+
+      // Slowly adjust brightness
+      if(Soulmate::brightness <= 255 && FastLED.getBrightness() != Soulmate::brightness) {
+        if (FastLED.getBrightness() < Soulmate::brightness) {
+          FastLED.setBrightness(FastLED.getBrightness() + 1);
+        } else {
+          FastLED.setBrightness(FastLED.getBrightness() - 1);
+        }
       }
     } else {
       FastLED.setBrightness(0);
@@ -475,20 +482,16 @@ void TurnOff() {
   Soulmate::on = false;
 }
 
+namespace Solid {
+  bool solid(uint8_t hue, uint8_t saturation, uint8_t value) {
+    for(int i=0; i<N_CELLS; i++){
+      Soulmate::led_arr[i] = CHSV(hue, saturation, value);
+    }
 
+    return true;
+  }
+}
 
-// Sample pattern
-
-// namespace Solid {
-//   bool solid(uint8_t hue, uint8_t saturation, uint8_t value) {
-//     for(int i=0; i<N_CELLS; i++){
-//       Soulmate::led_arr[i] = CHSV(hue, saturation, value);
-//     }
-//
-//     return true;
-//   }
-// }
-//
-// bool black() {
-//   return Solid::solid(0, 0, 0);
-// }
+bool black() {
+  return Solid::solid(0, 0, 0);
+}
