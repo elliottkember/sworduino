@@ -1,3 +1,5 @@
+// Soulmate config stuff
+
 #define FASTLED_ALLOW_INTERRUPTS 0
 #define FASTLED_ESP8266_NODEMCU_PIN_ORDER
 #define MAX_ALLOWED_VOLTS 5
@@ -11,8 +13,8 @@
   #define BUTTON_PIN 3 // Which pin receives signal that a button was pushed?
   #define REMOTE_CONTROL_PIN -1 //Receives data from an IR remote control
 #elif defined(ESP32)
- #define DATA_PIN 23 //23 // Which pin data is sent to on the Teensy (DOUT)
- #define CLOCK_PIN 18 //18 // Which pin the clock is triggered on the Teensy (SPI)
+ #define DATA_PIN 18 //23 // Which pin data is sent to on the Teensy (DOUT)
+ #define CLOCK_PIN 23 //18 // Which pin the clock is triggered on the Teensy (SPI)
  #define BUTTON_PIN -1 // Which pine receives signal that a button was pushed?
  #define REMOTE_CONTROL_PIN -1 //Receives data from an IR remote control
 #else // Teensy
@@ -22,12 +24,18 @@
  #define REMOTE_CONTROL_PIN 14 //Receives data from an IR remote control
 #endif
 
+
+
+
+
+
+
+
 // Main Soulmate class
 
 namespace Soulmate {
   uint8_t brightness = 255;
   int which_routine = 0;
-  bool buttonValue = true;
   bool on = true;
 
   int SafeRoutineID(int i) {
@@ -61,16 +69,13 @@ namespace Soulmate {
   }
 
   void setup() {
-    // wdt_disable();
     pinMode(13, OUTPUT);
-
     #if defined(ESP8266) || defined(ESP32)
       wemos();
     #else
       // Default is to assume TEENSYDUINO compatibility
       teensy();
     #endif
-
     fastled();
   }
 
@@ -171,21 +176,4 @@ void TurnOn() {
 
 void TurnOff() {
   Soulmate::on = false;
-}
-
-namespace Solid {
-
-  void solidColor(CRGB color) {
-    for(int i=0; i<N_CELLS; i++){
-      Soulmate::led_arr[i] = color;
-    }
-  }
-
-  void solid(uint8_t hue, uint8_t saturation, uint8_t value) {
-    solidColor(CHSV(hue, saturation, value));
-  }
-}
-
-void black() {
-  Solid::solid(0, 0, 0);
 }
