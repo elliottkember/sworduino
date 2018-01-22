@@ -62,7 +62,7 @@ namespace Flame {
       if(pt.y==0){
         continue;
       }
-    
+
       flame_new_state[i] = 0;
 
       struct Grid::Neighbors nb = Grid::InfiniteGetNeighbors(pt);
@@ -84,7 +84,7 @@ namespace Flame {
         flame_new_state[i] += flame_state[neighborIndex];
         n_contributing_neighbors++;
       }
-    //   flame_new_state[i] = std::max(flame_new_state[i]/std::max(1,n_contributing_neighbors) - Util::rand_range(0,16), 0);
+      flame_new_state[i] = std::max(flame_new_state[i]/std::max(1,n_contributing_neighbors) - Util::rand_range(0,16), 0);
     }
   }
 
@@ -138,5 +138,5 @@ namespace Flame {
 }
 
 bool flame(bool shift_hues, int min_temp_override, int max_temp_override) {
-  // return Flame::flame(shift_hues, min_temp_override, max_temp_override);
+  return Flame::flame(shift_hues, min_temp_override, max_temp_override);
 }

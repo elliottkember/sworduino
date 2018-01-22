@@ -1,14 +1,15 @@
 #define FASTLED_ALLOW_INTERRUPTS 0
 #define FASTLED_ESP8266_NODEMCU_PIN_ORDER
+//#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
 
 #include <FastLED.h>
 
-#define N_LEDS 100
+#define N_LEDS 1100
 #define DEBUG false
-#define MAX_ALLOWED_MILLIAMPS 10000
-#define LED_TYPE APA102
+#define MAX_ALLOWED_MILLIAMPS 1000
+#define LED_TYPE SK9822
 // #define LEDS_WS2812B
-#define LEDS_PER_ROW 20
+#define LEDS_PER_ROW 22
 #define N_CELLS (N_LEDS + N_LEDS % LEDS_PER_ROW)
 
 // TODO: These should be standardized and out of htere
