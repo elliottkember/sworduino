@@ -70,7 +70,7 @@ namespace Waves {
       }
     }
 
-    leds.show();  // not sure if this function is needed  to update each frame
+    // leds.show();  // not sure if this function is needed  to update each frame
   }
 }
 
@@ -81,6 +81,9 @@ inline uint8_t fastCosineCalc( uint16_t preWrapVal)
   return (pgm_read_byte_near(cos_wave+wrapVal));
 }
 
-waves() {
+
+
+void waves() {
   Waves::play();
 }
+
