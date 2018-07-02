@@ -3,8 +3,8 @@
 DynamicJsonBuffer jsonBuffer(500);
 void setupLanternPattern() {
   // Set up Serial for lantern pattern
-  Serial1.begin(9600);
-  Serial1.setTimeout(10);
+//  Serial1.begin(9600);
+//  Serial1.setTimeout(10);
 }
 
 
@@ -22,26 +22,26 @@ int snake = 0;
 int speed = 1;
 
 void setSettingsFromSerial() {
-    if(Serial1.available()) {
-      JsonObject& root = jsonBuffer.parseObject(Serial1);
-      root.prettyPrintTo(Serial);
-  
-      float hueDecimal = root["hue"];
-      if (hueDecimal) {
-        newHue = hueDecimal * 255;
-      }
-  
-      float brightnessDecimal = root["brightness"];
-      if (brightnessDecimal) {
-        newBrightness = brightnessDecimal * 255.0;
-        if (newBrightness < 3.0) newBrightness = 0;
-      }
-  
-      float speedDecimal = root["speed"];
-      if (speedDecimal) {
-        speed = (speedDecimal * 50);
-      }
-    }
+//    if(Serial1.available()) {
+//      JsonObject& root = jsonBuffer.parseObject(Serial1);
+//      root.prettyPrintTo(Serial);
+//  
+//      float hueDecimal = root["hue"];
+//      if (hueDecimal) {
+//        newHue = hueDecimal * 255;
+//      }
+//  
+//      float brightnessDecimal = root["brightness"];
+//      if (brightnessDecimal) {
+//        newBrightness = brightnessDecimal * 255.0;
+//        if (newBrightness < 3.0) newBrightness = 0;
+//      }
+//  
+//      float speedDecimal = root["speed"];
+//      if (speedDecimal) {
+//        speed = (speedDecimal * 50);
+//      }
+//    }
 
   EVERY_N_MILLISECONDS(10) {
     if (newBrightness > FastLED.getBrightness()) {

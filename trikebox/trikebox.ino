@@ -54,9 +54,10 @@ namespace Soulmate {
 }
 
 void setPixel(uint16_t index, CRGB pixel) {
-  int g = pixel.g;
-  int b = pixel.b;
-  int r = pixel.r;
+  Serial.println(brightnessScale);
+  int g = max(pixel.g * brightnessScale, 0);
+  int b = max(pixel.b * brightnessScale, 0);
+  int r = max(pixel.r * brightnessScale, 0);
   leds.setPixel(index, ((r << 16) | (g << 8) | b));
 }
 
