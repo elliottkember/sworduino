@@ -3,12 +3,15 @@ float brightnessScale = 0.8;
 #include <FastLED.h>
 #define LEDS_PER_ROW 72
 #define COLS_LEDs 72  // all of the following params need to be adjusted for screen size
+// (we actually use 12 rows. Don't know why this is 16)
 #define ROWS_LEDs 16 // LED_LAYOUT assumed 0 if ROWS_LEDs > 8
 #define LEDS_PER_STRIP (COLS_LEDs * (ROWS_LEDs / 8))
 #define LED_LAYOUT 0
 
-#define qsubd(x, b)  ((x>b)?255:0)  // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
-#define qsuba(x, b)  ((x>b)?x-b:0)  // Analog Unsigned subtraction macro. if result <0, then => 0
+// Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
+#define qsubd(x, b) ((x>b)?255:0)
+// Analog Unsigned subtraction macro. if result <0, then => 0
+#define qsuba(x, b) ((x>b)?x-b:0)
 
 DMAMEM int displayMemory[LEDS_PER_STRIP*6];
 int drawingMemory[LEDS_PER_STRIP*6];
