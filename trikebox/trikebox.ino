@@ -26,6 +26,16 @@ namespace Util {
 
 bool lastSwitchPosition;
 
+#define num_routines 5
+int routine = 0;
+const char* routines[num_routines] = {
+  "Waves",
+  "Sparkles",
+  "Rainbow",
+  "Wipe",
+  "Box"
+};
+
 void setup() {
   Serial.begin(57600);
   pinMode(13, OUTPUT);
@@ -33,6 +43,8 @@ void setup() {
   leds.begin();
   leds.show();
   delay(100);
+
+  routine = random(0, num_routines);
 
   // Startup brightness
   brightnessScale = digitalRead(0) ? 0 : 0.8;
@@ -75,18 +87,10 @@ void map() {
   }
 }
 
-#define num_routines 3
-int routine = 0;
-const char* routines[num_routines] = {
-  "Waves",
-  "Sparkles",
-  "Rainbow"
-};
-
 void loop() {
   checkSwitch();
 
-  EVERY_N_SECONDS(30) {
+  EVERY_N_SECONDS(300) {
     routine += 1;
     if (routine == num_routines) routine = 0;
   }
@@ -103,6 +107,12 @@ void loop() {
       rainbow();
       map();
       break;
+    case 3:
+      wipe();
+      map();
+    case 4:
+      box();
+      map();
     default:
       break;
   }
