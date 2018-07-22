@@ -1,4 +1,5 @@
-float brightnessScale = 0.8;
+uint8_t maxBrightness = 1;
+float brightnessScale = maxBrightness;
 #include <OctoWS2811.h>
 #include <FastLED.h>
 #define LEDS_PER_ROW 72
@@ -27,19 +28,25 @@ namespace Util {
 #define N_CELLS 1224
 #define N_LEDS 1224
 
-bool lastSwitchPosition;
+bool wasOff;
 
-#define num_routines 5
+#define num_routines 6
 int routine = 0;
 const char* routines[num_routines] = {
   "Waves",
   "Sparkles",
   "Rainbow",
   "Wipe",
-  "Box"
+  "Box",
+  "Squares",
 };
 
+int bpms[864];
+
 void setup() {
+  for (int i = 0; i < 864; i++) {
+    bpms[i] = random(10, 30);
+  }
   Serial.begin(57600);
   pinMode(13, OUTPUT);
   pinMode(0, INPUT_PULLUP);
@@ -50,7 +57,12 @@ void setup() {
   routine = random(0, num_routines);
 
   // Startup brightness
-  brightnessScale = digitalRead(0) ? 0 : 0.8;
+  brightnessScale = digitalRead(0) ? 0 : maxBrightness;
+}
+
+void nextRoutine() {
+  routine += 1;
+  if (routine == num_routines) routine = 0;
 }
 
 // Power switch - turns brightnessScale between 0 and 1
@@ -58,10 +70,13 @@ void checkSwitch() {
   bool off = digitalRead(0);
   if (off && brightnessScale > 0) {
     brightnessScale -= 0.01;
-  } else if (!off && brightnessScale < 0.8) {
+  } else if (!off && brightnessScale < maxBrightness) {
     brightnessScale += 0.01;
   }
-  lastSwitchPosition = off;
+  if (wasOff && !off) {
+    nextRoutine();
+  }
+  wasOff = off;
 }
 
 namespace Soulmate {
@@ -69,7 +84,6 @@ namespace Soulmate {
 }
 
 void setPixel(uint16_t index, CRGB pixel) {
-  Serial.println(brightnessScale);
   int g = max(pixel.g * brightnessScale, 0);
   int b = max(pixel.b * brightnessScale, 0);
   int r = max(pixel.r * brightnessScale, 0);
@@ -94,10 +108,9 @@ void loop() {
   checkSwitch();
 
   EVERY_N_SECONDS(300) {
-    routine += 1;
-    if (routine == num_routines) routine = 0;
+    nextRoutine();
   }
-  
+
   switch (routine) {
     case 0:
       waves();
@@ -115,6 +128,9 @@ void loop() {
       map();
     case 4:
       box();
+      map();
+    case 5:
+      squares();
       map();
     default:
       break;
