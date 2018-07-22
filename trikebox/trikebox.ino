@@ -30,7 +30,7 @@ namespace Util {
 
 bool wasOff;
 
-#define num_routines 6
+#define num_routines 7
 int routine = 0;
 const char* routines[num_routines] = {
   "Waves",
@@ -39,13 +39,14 @@ const char* routines[num_routines] = {
   "Wipe",
   "Box",
   "Squares",
+  "Starfield"
 };
 
 int bpms[864];
 
 void setup() {
   for (int i = 0; i < 864; i++) {
-    bpms[i] = random(10, 30);
+    bpms[i] = random(3, 40);
   }
   Serial.begin(57600);
   pinMode(13, OUTPUT);
@@ -126,11 +127,17 @@ void loop() {
     case 3:
       wipe();
       map();
+      break;
     case 4:
       box();
       map();
+      break;
     case 5:
       squares();
+      map();
+      break;
+    case 6:
+      starField();
       map();
     default:
       break;
