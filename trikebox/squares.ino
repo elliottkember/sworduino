@@ -5,7 +5,7 @@ namespace Squares {
     int hue = 0;
 
     for (int y = 0; y < 12; y+=2) {
-        for (int x = 0; x < 72; x+=2) {
+      for (int x = 0; x < 72; x+=2) {
         uint16_t index = y * 72 + x;
         hue += 36;
         uint16_t bpm = bpms[index];
