@@ -4,16 +4,13 @@ float brightnessScale = maxBrightness;
 #include <FastLED.h>
 #define LEDS_PER_ROW 72
 #define COLS_LEDs 72  // all of the following params need to be adjusted for screen size
-// (we actually use 12 rows. Don't know why this is 16)
-#define ROWS_LEDs 16 // LED_LAYOUT assumed 0 if ROWS_LEDs > 8
+#define ROWS_LEDs 16 // Actually 12. Double-check this
 #define LEDS_PER_STRIP (COLS_LEDs * (ROWS_LEDs / 8))
 #define LED_LAYOUT 0
-
 // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
 #define qsubd(x, b) ((x>b)?255:0)
 // Analog Unsigned subtraction macro. if result <0, then => 0
 #define qsuba(x, b) ((x>b)?x-b:0)
-
 DMAMEM int displayMemory[LEDS_PER_STRIP*6];
 int drawingMemory[LEDS_PER_STRIP*6];
 const int config = WS2811_GRB | WS2811_800kHz;
@@ -28,9 +25,9 @@ namespace Util {
 #define N_CELLS 1224
 #define N_LEDS 1224
 
-bool wasOff;
+bool buttonWasOff;
 
-#define num_routines 7
+#define num_routines 8
 int routine = 0;
 const char* routines[num_routines] = {
   "Waves",
@@ -39,20 +36,26 @@ const char* routines[num_routines] = {
   "Wipe",
   "Box",
   "Squares",
-  "Starfield"
+  "Starfield",
+  "Barbershop"
 };
 
 int bpms[864];
 
 void setup() {
+
   for (int i = 0; i < 864; i++) {
     bpms[i] = random(3, 40);
   }
+
   Serial.begin(57600);
+
   pinMode(13, OUTPUT);
   pinMode(0, INPUT_PULLUP);
+
   leds.begin();
   leds.show();
+
   delay(100);
 
   routine = random(0, num_routines);
@@ -68,16 +71,16 @@ void nextRoutine() {
 
 // Power switch - turns brightnessScale between 0 and 1
 void checkSwitch() {
-  bool off = digitalRead(0);
-  if (off && brightnessScale > 0) {
+  bool buttonIsOff = digitalRead(0);
+  if (buttonIsOff && brightnessScale > 0) {
     brightnessScale -= 0.01;
-  } else if (!off && brightnessScale < maxBrightness) {
+  } else if (!buttonIsOff && brightnessScale < maxBrightness) {
     brightnessScale += 0.01;
   }
-  if (wasOff && !off) {
+  if (buttonWasOff && !buttonIsOff) {
     nextRoutine();
   }
-  wasOff = off;
+  buttonWasOff = buttonIsOff;
 }
 
 namespace Soulmate {
@@ -138,6 +141,10 @@ void loop() {
       break;
     case 6:
       starField();
+      map();
+      break;
+    case 7:
+      barbershop();
       map();
     default:
       break;
