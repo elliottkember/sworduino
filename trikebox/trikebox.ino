@@ -108,47 +108,53 @@ void map() {
   }
 }
 
+class Shape {
+  uint16_t indices[30];
+}
+
 void loop() {
   checkSwitch();
 
-  EVERY_N_SECONDS(300) {
-    nextRoutine();
-  }
+  tetris();
 
-  switch (routine) {
-    case 0:
-      waves();
-      break;
-    case 1:
-      sparkles();
-      map();
-      break;
-    case 2:
-      rainbow();
-      map();
-      break;
-    case 3:
-      wipe();
-      map();
-      break;
-    case 4:
-      box();
-      map();
-      break;
-    case 5:
-      squares();
-      map();
-      break;
-    case 6:
-      starField();
-      map();
-      break;
-    case 7:
-      barbershop();
-      map();
-    default:
-      break;
-  }
+  // EVERY_N_SECONDS(300) {
+  //   nextRoutine();
+  // }
+
+  // switch (routine) {
+  //   case 0:
+  //     waves();
+  //     break;
+  //   case 1:
+  //     sparkles();
+  //     map();
+  //     break;
+  //   case 2:
+  //     rainbow();
+  //     map();
+  //     break;
+  //   case 3:
+  //     wipe();
+  //     map();
+  //     break;
+  //   case 4:
+  //     box();
+  //     map();
+  //     break;
+  //   case 5:
+  //     squares();
+  //     map();
+  //     break;
+  //   case 6:
+  //     starField();
+  //     map();
+  //     break;
+  //   case 7:
+  //     barbershop();
+  //     map();
+  //   default:
+  //     break;
+  // }
   
   leds.show();
 }
