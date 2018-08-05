@@ -27,7 +27,7 @@ namespace Util {
 
 bool buttonWasOff;
 
-#define num_routines 8
+#define num_routines 9
 int routine = 0;
 const char* routines[num_routines] = {
   "Waves",
@@ -37,7 +37,8 @@ const char* routines[num_routines] = {
   "Box",
   "Squares",
   "Starfield",
-  "Barbershop"
+  "Barbershop",
+  "Rays"
 };
 
 int bpms[864];
@@ -58,6 +59,8 @@ void setup() {
   delay(100);
 
   routine = random(0, num_routines);
+
+  FastLED.setDither(0);
 
   // Startup brightness
   brightnessScale = digitalRead(0) ? 0 : maxBrightness;
@@ -107,108 +110,52 @@ void map() {
   }
 }
 
-class Point {
-public:
-  double x, y;
-};
-
-Point drops[5] = {};
-bool initializedPoints = false;
-
-void sine() {
-
-  if (!initializedPoints) {
-    for (int i = 0; i < 5; i++) {
-      Point p = drops[i];
-      p.x = random(0, 16);
-      p.y = random(0, 72);
-      drops[i] = p;
-    }
-    initializedPoints = true;
-  }
-  
-  for (int p = 0; p < 5; p++) {
-    Point point = drops[p];
-    point.y += 1;
-    if (point.y > 30) {
-      point.y = -5;
-      point.x = random(0, 72);
-    }
-    drops[p] = point;
-  }
-
-  fadeToBlackBy(Soulmate::led_arr, N_LEDS, 40);
-    
-  for (int y = 12; y >= 0; y--) {
-    for (int x = 0; x < 72; x++) {
-      uint16_t index = y * 72 + x;
-
-      for (int p = 0; p < 5; p++) {
-        Point point = drops[p];
-        double distance = sqrt16(sq(point.x - x) - sq(point.y - y));
-        Serial.println(distance);
-        if (distance < 1) {
-          Soulmate::led_arr[index] = CHSV(p * 30, 255, 255 / distance);
-        }
-      }
-      
-//        if (y == 0) {
-//          int brightness = random(0, 100) > 90 ? 255 : 0;
-//          int hue = random(0, 100);
-//          Soulmate::led_arr[index] = CHSV(hue, 255, brightness);
-//        } else {
-//          uint16_t previousIndex = (y-1) * 72 + x;
-//          Soulmate::led_arr[index] = Soulmate::led_arr[previousIndex];
-//        }
-    }
-  }
-  
-  map();
-}
-
 void loop() {
   checkSwitch();
 
-  sine();
+   EVERY_N_SECONDS(300) {
+     nextRoutine();
+   }
 
-  // EVERY_N_SECONDS(300) {
-  //   nextRoutine();
-  // }
-
-  // switch (routine) {
-  //   case 0:
-  //     waves();
-  //     break;
-  //   case 1:
-  //     sparkles();
-  //     map();
-  //     break;
-  //   case 2:
-  //     rainbow();
-  //     map();
-  //     break;
-  //   case 3:
-  //     wipe();
-  //     map();
-  //     break;
-  //   case 4:
-  //     box();
-  //     map();
-  //     break;
-  //   case 5:
-  //     squares();
-  //     map();
-  //     break;
-  //   case 6:
-  //     starField();
-  //     map();
-  //     break;
-  //   case 7:
-  //     barbershop();
-  //     map();
-  //   default:
-  //     break;
-  // }
+   switch (routine) {
+     case 0:
+       waves();
+       break;
+     case 1:
+       sparkles();
+       map();
+       break;
+     case 2:
+       rainbow();
+       map();
+       break;
+     case 3:
+       wipe();
+       map();
+       break;
+     case 4:
+       box();
+       map();
+       break;
+     case 5:
+       squares();
+       map();
+       break;
+     case 6:
+       starField();
+       map();
+       break;
+     case 7:
+       barbershop();
+       map();
+       break;
+    case 8:
+      rays();
+      map();
+      break;
+     default:
+       break;
+   }
   
   leds.show();
 }
