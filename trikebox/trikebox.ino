@@ -43,7 +43,6 @@ const char* routines[num_routines] = {
 int bpms[864];
 
 void setup() {
-
   for (int i = 0; i < 864; i++) {
     bpms[i] = random(3, 40);
   }
@@ -108,14 +107,69 @@ void map() {
   }
 }
 
-class Shape {
-  uint16_t indices[30];
+class Point {
+public:
+  double x, y;
+};
+
+Point drops[5] = {};
+bool initializedPoints = false;
+
+void sine() {
+
+  if (!initializedPoints) {
+    for (int i = 0; i < 5; i++) {
+      Point p = drops[i];
+      p.x = random(0, 16);
+      p.y = random(0, 72);
+      drops[i] = p;
+    }
+    initializedPoints = true;
+  }
+  
+  for (int p = 0; p < 5; p++) {
+    Point point = drops[p];
+    point.y += 1;
+    if (point.y > 30) {
+      point.y = -5;
+      point.x = random(0, 72);
+    }
+    drops[p] = point;
+  }
+
+  fadeToBlackBy(Soulmate::led_arr, N_LEDS, 40);
+    
+  for (int y = 12; y >= 0; y--) {
+    for (int x = 0; x < 72; x++) {
+      uint16_t index = y * 72 + x;
+
+      for (int p = 0; p < 5; p++) {
+        Point point = drops[p];
+        double distance = sqrt16(sq(point.x - x) - sq(point.y - y));
+        Serial.println(distance);
+        if (distance < 1) {
+          Soulmate::led_arr[index] = CHSV(p * 30, 255, 255 / distance);
+        }
+      }
+      
+//        if (y == 0) {
+//          int brightness = random(0, 100) > 90 ? 255 : 0;
+//          int hue = random(0, 100);
+//          Soulmate::led_arr[index] = CHSV(hue, 255, brightness);
+//        } else {
+//          uint16_t previousIndex = (y-1) * 72 + x;
+//          Soulmate::led_arr[index] = Soulmate::led_arr[previousIndex];
+//        }
+    }
+  }
+  
+  map();
 }
 
 void loop() {
   checkSwitch();
 
-  tetris();
+  sine();
 
   // EVERY_N_SECONDS(300) {
   //   nextRoutine();
