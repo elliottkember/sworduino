@@ -47,21 +47,15 @@ void setup() {
   for (int i = 0; i < 864; i++) {
     bpms[i] = random(3, 40);
   }
-
+  randomSeed(analogRead(0));
   Serial.begin(57600);
-
   pinMode(13, OUTPUT);
   pinMode(0, INPUT_PULLUP);
-
   leds.begin();
   leds.show();
-
   delay(100);
-
   routine = random(0, num_routines);
-
   FastLED.setDither(0);
-
   // Startup brightness
   brightnessScale = digitalRead(0) ? 0 : maxBrightness;
 }
