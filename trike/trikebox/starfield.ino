@@ -1,10 +1,23 @@
+// Starfield wipes stars backwards across the box, wrapping around at the back
 namespace StarField {
   int hue = 0;
 
   void draw() {
-    hue = HUE_PURPLE + beatsin16(10, 0, 80);
+    hue = HUE_PURPLE + beatsin16(1, 0, 50);
+    int fade = 30;
+    uint8_t blurAmount = 10;
+    uint8_t blurLength = 20;
 
     EVERY_N_MILLISECONDS(40) {
+
+      // Blur the sparkles so they're not so singular
+      for (int y = 0; y < 12; y++) {
+        uint16_t stripStart = y * 72;
+        uint16_t stripEnd = ((y + 1) * 72) - 1;
+        blur1d(Soulmate::led_set(stripStart, stripStart + blurLength), blurLength, blurAmount);
+        blur1d(Soulmate::led_set(stripEnd - blurLength, stripEnd), blurLength, blurAmount);
+      }
+      
       // Left side
       for (int x = 36; x >= 0; x--) {
         for (int y = 0; y < 12; y++) {
@@ -36,13 +49,14 @@ namespace StarField {
       }
 
       // Back fade
-      int fade = 60;
       for (int y = 0; y < 12; y++) {
+        // right
         for (int x = 36; x <= 51; x++) {
           uint16_t index = y * 72 + x;
           Soulmate::led_arr[index].fadeToBlackBy(fade);
         }
 
+        // left
         for (int x = 36; x >= 21; x--) {
           uint16_t index = y * 72 + x;
           Soulmate::led_arr[index].fadeToBlackBy(fade);

@@ -81,6 +81,7 @@ void checkSwitch() {
 
 namespace Soulmate {
   CRGB led_arr[N_LEDS];
+  CRGBSet led_set(led_arr, N_LEDS);
 }
 
 void setPixel(uint16_t index, CRGB pixel) {
@@ -143,10 +144,10 @@ void loop() {
        barbershop();
        map();
        break;
-    case 8:
-      rays();
-      map();
-      break;
+     case 8:
+       rays();
+       map();
+       break;
      default:
        break;
    }
