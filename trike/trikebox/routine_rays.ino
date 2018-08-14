@@ -1,20 +1,48 @@
-#define NUMBER_OF_RAYS 5
+#define NUMBER_OF_RAYS 10
 
 namespace Rays {
-
+  
   class Point {
   public:
     double x, y;
+    bool isGoingDownwards;
+    int pointNumber;
     void reset() {
-      y = -5;
-      x = random(0, 72);
+      if (isGoingDownwards) {
+        y = -30;
+        x = random(0, 72);
+      } else {
+        x = -50; // random(0, 100) > 50 ? 80 : -10;
+        y = random(0, 12);
+      }
     }
     void start() {
+      isGoingDownwards = rand() % 2 == 0;
       x = random(0, 72);
       y = random(0, 16);
     }
-    void move(int p) {
-      y += (double)beatsin16(12, 10, 50, p * 3000) / 100;
+    void move() {
+      if (isGoingDownwards) {
+        y += (double)beatsin16(30, 2, 8, pointNumber * 3000) / 100; 
+      } else {
+        x += (double)beatsin16(30, 10, 50, pointNumber * 3000) / 100;
+      }
+      if (y > 30 || x > 120) {
+        reset();
+      }
+    }
+    void draw() {
+      int diameter = beatsin16(30, 3, 10, pointNumber * 3000, pointNumber * 3000);
+      
+      for (uint16_t xx = x - diameter; xx < x + diameter; xx++) {
+        for (uint16_t yy = y - diameter; yy < y + diameter; yy++) {
+          uint16_t index = yy * 72 + xx;
+          double distance = sqrt16(sq(xx - x) + sq(yy - y));
+          if (index > 0 && index < N_LEDS && distance < diameter) {
+            Soulmate::led_arr[index] += CHSV(pointNumber * 30, 255, 255 / distance);
+          }
+        }
+      }
     }
   };
   
@@ -25,41 +53,24 @@ namespace Rays {
     if (!initializedPoints) {
       for (int i = 0; i < NUMBER_OF_RAYS; i++) {
         Point p = drops[i];
+        p.pointNumber = i;
         p.start();
         drops[i] = p;
       }
       initializedPoints = true;
     }
     
-    for (int p = 0; p < 5; p++) {
+    for (int p = 0; p < NUMBER_OF_RAYS; p++) {
       Point point = drops[p];
-      point.move(p);
-      if (point.y > 20) {
-        point.reset();
-      }
+      point.move();
       drops[p] = point;
     }
   
     fadeToBlackBy(Soulmate::led_arr, N_LEDS, 120);
-      
-    for (int y = 12; y >= 0; y--) {
-      for (int x = 0; x < 72; x++) {
-        uint16_t index = y * 72 + x;
-        
-        for (int p = 0; p < NUMBER_OF_RAYS; p++) {
-          Point point = drops[p];
-          if (abs8(point.x - x) < 10 && abs8(point.y - y) < 10) {
-            double distance = sqrt16(sq(point.x - x) + sq(point.y - y));
-            int diameter = beatsin16(30, 3, 10, p * 3000, p * 3000);
-            if (distance < diameter) {
-              Soulmate::led_arr[index] += CHSV(p * 30, 255, 255 / distance);
-            }  
-          }
-        }
-      }
+
+    for (int p = 0; p < NUMBER_OF_RAYS; p++) {
+      drops[p].draw();
     }
-    
-    map();
   }
 }
 

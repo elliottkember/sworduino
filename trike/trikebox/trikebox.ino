@@ -55,7 +55,7 @@ void setup() {
   leds.show();
   delay(100);
   routine = random(0, num_routines);
-  FastLED.setDither(0);
+  FastLED.setDither(1);
   // Startup brightness
   brightnessScale = digitalRead(0) ? 0 : maxBrightness;
 }
@@ -151,6 +151,6 @@ void loop() {
      default:
        break;
    }
-  
+
   leds.show();
 }
