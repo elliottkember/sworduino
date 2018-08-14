@@ -23,7 +23,7 @@ namespace Rays {
     }
     void move() {
       if (isGoingDownwards) {
-        y += (double)beatsin16(30, 2, 8, pointNumber * 3000) / 100; 
+        y += (double)beatsin16(30, 4, 10, pointNumber * 3000) / 100; 
       } else {
         x += (double)beatsin16(30, 10, 50, pointNumber * 3000) / 100;
       }

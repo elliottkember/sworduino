@@ -4,7 +4,7 @@ float brightnessScale = maxBrightness;
 #include <FastLED.h>
 #define LEDS_PER_ROW 72
 #define COLS_LEDs 72  // all of the following params need to be adjusted for screen size
-#define ROWS_LEDs 16 // Actually 12. Double-check this
+#define ROWS_LEDs 16 // Actually 12, but 12 prints every other line
 #define LEDS_PER_STRIP (COLS_LEDs * (ROWS_LEDs / 8))
 #define LED_LAYOUT 0
 // Digital unsigned subtraction macro. if result <0, then => 0. Otherwise, take on fixed value.
@@ -22,12 +22,12 @@ namespace Util {
   }
 }
 
-#define N_CELLS 1224
-#define N_LEDS 1224
+#define N_CELLS 864
+#define N_LEDS 864
 
 bool buttonWasOff;
 
-#define num_routines 9
+#define num_routines 12
 int routine = 0;
 const char* routines[num_routines] = {
   "Waves",
@@ -38,7 +38,10 @@ const char* routines[num_routines] = {
   "Squares",
   "Starfield",
   "Barbershop",
-  "Rays"
+  "Rays",
+  "Globe",
+  "Purple Sparkles",
+  "Lantern"
 };
 
 int bpms[864];
@@ -108,49 +111,61 @@ void map() {
 void loop() {
   checkSwitch();
 
-   EVERY_N_SECONDS(300) {
-     nextRoutine();
-   }
+  EVERY_N_SECONDS(300) {
+    nextRoutine();
+  }
 
-   switch (routine) {
-     case 0:
-       waves();
-       break;
-     case 1:
-       sparkles();
-       map();
-       break;
-     case 2:
-       rainbow();
-       map();
-       break;
-     case 3:
-       wipe();
-       map();
-       break;
-     case 4:
-       box();
-       map();
-       break;
-     case 5:
-       squares();
-       map();
-       break;
-     case 6:
-       starField();
-       map();
-       break;
-     case 7:
-       barbershop();
-       map();
-       break;
-     case 8:
-       rays();
-       map();
-       break;
-     default:
-       break;
-   }
+  switch (routine) {
+    case 0:
+      waves();
+      break;
+    case 1:
+      sparkles();
+      map();
+      break;
+    case 2:
+      rainbow();
+      map();
+      break;
+    case 3:
+      wipe();
+      map();
+      break;
+    case 4:
+      box();
+      map();
+      break;
+    case 5:
+      squares();
+      map();
+      break;
+    case 6:
+      starField();
+      map();
+      break;
+    case 7:
+      barbershop();
+      map();
+      break;
+    case 8:
+      rays();
+      map();
+      break;
+    case 9:
+      globe();
+      map();
+      break;
+    case 10:
+      purpleSparkles();
+      map();
+      break;
+    case 11:
+      lantern();
+      map();
+      break;
+    default:
+      break;
+  }
 
   leds.show();
 }
